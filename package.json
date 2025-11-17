@@ -1,8 +1,36 @@
 {
   "name": "react-lzy-img",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
+  "version": "0.1.0",
+  "description": "A modern, performant React lazy image and picture component library with hooks, TypeScript, and blur-up support.",
+
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.es.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.es.js",
+      "require": "./dist/index.cjs.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/garrettsiegel/react-lzy-img.git"
+  },
+  "author": "Garrett Siegel <garrettsiegel@gmail.com>",
+  "license": "MIT",
+  "keywords": [
+    "react",
+    "lazy",
+    "image",
+    "picture",
+    "typescript",
+    "blur-up",
+    "intersection-observer",
+    "responsive",
+    "component",
+    "npm-package"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -10,8 +38,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+  },
+  "peerDependencies": {
+    "react": ">=17.0.0",
+    "react-dom": ">=17.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

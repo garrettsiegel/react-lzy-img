@@ -1,0 +1,10 @@
+# Ignore files not to be published to npm
+src/*.test.*
+*.log
+*.tsbuildinfo
+coverage/
+__tests__/
+.vscode/
+*.config.js
+*.config.ts
+*.env*
