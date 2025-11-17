@@ -3,7 +3,7 @@
 
 A lightweight, high-performance React library for lazy loading images with TypeScript support. Includes components for both standard images and responsive pictures, with built-in fade-in animations and blur-up placeholder support.
 
-> **~4.8 KB gzipped** | **0 dependencies** | **Tree-shakeable** | **TypeScript-first**
+> **~1.7 KB gzipped** | **0 dependencies** | **Tree-shakeable** | **TypeScript-first**
 
 ## Features
 
@@ -148,7 +148,7 @@ Modern browsers with `IntersectionObserver` support. Falls back to immediate loa
 
 ## Performance
 
-- Bundle size: ~4.8 KB gzipped
+- Bundle size: ~1.7 KB gzipped
 - Zero dependencies (only requires React)
 - Tree-shakeable ESM exports
 - Uses native IntersectionObserver API
