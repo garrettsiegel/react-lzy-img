@@ -32,7 +32,7 @@
   ],
   "scripts": {
     "dev": "vite",
-    "build": "tsc --project tsconfig.build.json && vite build",
+    "build": "rm -f dist/*.js && tsc --project tsconfig.build.json && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },

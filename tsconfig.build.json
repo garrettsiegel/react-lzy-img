@@ -5,7 +5,7 @@
     "module": "ESNext",
     "moduleResolution": "node",
     "declaration": true,
-    "declarationMap": true,
+    "declarationMap": false,
     "emitDeclarationOnly": true,
     "outDir": "./dist",
     "noEmit": false,
@@ -17,6 +17,6 @@
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": false
   },
-  "include": ["src/**/*"],
+  "include": ["src/index.ts"],
   "exclude": ["node_modules", "dist", "**/*.test.*", "**/*.spec.*"]
 }

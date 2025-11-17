@@ -32,6 +32,6 @@ export default defineConfig({
       },
     },
     outDir: 'dist',
-    emptyOutDir: true,
+    emptyOutDir: false, // Don't clear dist folder to preserve TypeScript declarations
   },
 });
