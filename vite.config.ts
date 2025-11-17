@@ -12,21 +12,16 @@ export default defineConfig({
       formats: ['es', 'cjs'],
     },
     rollupOptions: {
-      external: ['react', 'react-dom'],
-      output: [
-        {
-          format: 'es',
-          entryFileNames: 'index.es.js',
+      external: (id) => {
+        return id === 'react' || id === 'react-dom' || id.startsWith('react/');
+      },
+      output: {
+        globals: {
+          react: 'React',
+          'react-dom': 'ReactDOM',
+          'react/jsx-runtime': 'React',
         },
-        {
-          format: 'cjs',
-          entryFileNames: 'index.cjs.js',
-          globals: {
-            react: 'React',
-            'react-dom': 'ReactDOM',
-          },
-        },
-      ],
+      },
     },
     outDir: 'dist',
     emptyOutDir: true,
