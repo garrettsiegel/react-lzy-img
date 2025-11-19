@@ -1,6 +1,6 @@
 {
   "name": "react-lzy-img",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "A modern, performant React lazy image and picture component library with hooks, TypeScript, and blur-up support.",
   "main": "dist/index.cjs.js",
   "module": "dist/index.es.js",
@@ -36,7 +36,9 @@
     "lint": "eslint .",
     "preview": "vite preview"
   },
-  "dependencies": {},
+  "dependencies": {
+    "blurhash": "^2.0.5"
+  },
   "peerDependencies": {
     "react": ">=17.0.0",
     "react-dom": ">=17.0.0"

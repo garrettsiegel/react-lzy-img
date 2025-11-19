@@ -13,6 +13,8 @@ export type Props = {
   onLoad?: () => void;
   onError?: (event: React.SyntheticEvent<HTMLImageElement, Event>) => void;
   fallback?: React.ReactNode | string;
+  blurhash?: string;
+  lqip?: string;
   rootMargin?: string;
 };
 
@@ -34,4 +36,6 @@ export interface LazyPictureProps extends Omit<React.ImgHTMLAttributes<HTMLImage
   rootMargin?: string;
   onError?: (event: React.SyntheticEvent<HTMLImageElement, Event>) => void;
   fallback?: React.ReactNode | string;
+  blurhash?: string;
+  lqip?: string;
 }

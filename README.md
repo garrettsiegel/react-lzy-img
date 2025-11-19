@@ -94,6 +94,8 @@ export default function ResponsiveImage() {
 | `src` | `string` | **required** | The image source URL |
 | `alt` | `string` | **required** | Alt text for accessibility |
 | `placeholder` | `string` | undefined | Blur-up placeholder image URL |
+| `blurhash` | `string` | undefined | Blurhash string for ultra-light blurred placeholder |
+| `lqip` | `string` | undefined | Base64-encoded low-quality image placeholder |
 | `fadeIn` | `boolean` | `true` | Enable fade-in transition |
 | `fadeInDuration` | `number` | `300` | Fade-in duration in milliseconds |
 | `width` | `number` | undefined | Container width (in pixels) |
@@ -118,6 +120,35 @@ Extends `LazyImage` props with:
 | `sizes` | `string` | undefined | Responsive image sizes |
 | `priority` | `boolean` | `false` | Load immediately (eager loading) |
 | `placeholderBlur` | `boolean` | `false` | Show blurred placeholder |
+| `blurhash` | `string` | undefined | Blurhash string for ultra-light blurred placeholder |
+| `lqip` | `string` | undefined | Base64-encoded low-quality image placeholder |
+### Blurhash & LQIP Placeholders
+
+**Blurhash** is a tiny string that encodes a blurred, colorful preview of your image. It’s decoded in the browser and shown as a fast, visually appealing placeholder while the real image loads. Extremely lightweight and used by sites like Unsplash.
+
+**LQIP** (Low-Quality Image Placeholder) is a tiny, base64-encoded version of your image. It’s shown as a pixelated preview before the real image loads.
+
+If both `blurhash` and `lqip` are provided, `blurhash` is used. If neither is provided, the regular `placeholder` is used.
+
+**Example:**
+
+```tsx
+<LazyImage
+  src="/real.jpg"
+  alt="Demo image"
+  blurhash="LEHV6nWB2yk8pyo0adR*.7kCMdnj"
+  width={400}
+  height={300}
+/>
+
+<LazyImage
+  src="/real.jpg"
+  alt="Demo image"
+  lqip="data:image/jpeg;base64,/9j/4AAQSk..."
+  width={400}
+  height={300}
+/>
+```
 | `onError` | `(event) => void` | undefined | Callback when image fails to load |
 | `fallback` | `React.ReactNode \| string` | undefined | Custom fallback UI or message if image fails to load |
 
