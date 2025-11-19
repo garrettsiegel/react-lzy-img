@@ -1,6 +1,6 @@
 {
   "name": "react-lzy-img",
-  "version": "0.1.13",
+  "version": "0.1.15",
   "type": "module",
   "description": "A modern, performant React lazy image and picture component library with hooks, TypeScript, and blur-up support.",
   "main": "dist/index.cjs.js",
