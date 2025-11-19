@@ -1,14 +1,17 @@
 
+
 # react-lzy-img
 
 A lightweight, high-performance React library for lazy loading images with TypeScript support. Includes components for both standard images and responsive pictures, with built-in fade-in animations and blur-up placeholder support.
 
-> **~1.7 KB gzipped** | **0 dependencies** | **Tree-shakeable** | **TypeScript-first**
+> **~1.7 KB gzipped (ESM)** | **~1.5 KB gzipped (CJS)** | **0 dependencies** | **Tree-shakeable** | **TypeScript-first**
 
 ## Features
 
+
 **High Performance**
 - Uses the native Intersection Observer API for efficient viewport detection
+- **Automatic native lazy loading fallback:** If Intersection Observer is unavailable, falls back to browser-native `<img loading="lazy">` for best compatibility
 - React 17+ compatible, works with React 18 and 19
 - Extremely lightweight with zero production dependencies
 - Automatically injects optimized CSS at runtime
@@ -142,16 +145,18 @@ CSS styles are automatically injected at runtime. Override using these class nam
 - `.LazyImage-fade` - Fade-in animation
 - `.grid-stack` and `.stack-item` - Grid stacking
 
+
 ## Browser Support
 
-Modern browsers with `IntersectionObserver` support. Falls back to immediate loading if unavailable.
+Modern browsers with `IntersectionObserver` support. If Intersection Observer is unavailable, the library automatically falls back to native browser lazy loading using `<img loading="lazy">`.
+
 
 ## Performance
 
-- Bundle size: ~1.7 KB gzipped
+- Bundle size: ~1.7 KB gzipped (ESM), ~1.5 KB gzipped (CJS)
 - Zero dependencies (only requires React)
 - Tree-shakeable ESM exports
-- Uses native IntersectionObserver API
+- Uses native IntersectionObserver API with automatic native lazy fallback
 
 ## Examples
 
