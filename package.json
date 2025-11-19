@@ -1,6 +1,7 @@
 {
   "name": "react-lzy-img",
-  "version": "0.1.11",
+  "version": "0.1.12",
+  "type": "module",
   "description": "A modern, performant React lazy image and picture component library with hooks, TypeScript, and blur-up support.",
   "main": "dist/index.cjs.js",
   "module": "dist/index.es.js",
@@ -32,7 +33,11 @@
   ],
   "scripts": {
     "dev": "vite",
-    "build": "rm -f dist/*.js && tsc --project tsconfig.build.json && vite build",
+    "build": "rm -rf dist && vite build && npm run build-types",
+    "build-types": "tsc --project tsconfig.build.json && npm run cleanup-types",
+    "cleanup-types": "find dist -name '*.d.ts' ! -name 'index.d.ts' -delete && npm run fix-index-types",
+    "fix-index-types": "node scripts/bundle-types.js",
+    "prepublishOnly": "npm run build",
     "lint": "eslint .",
     "preview": "vite preview"
   },

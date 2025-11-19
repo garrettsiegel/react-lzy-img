@@ -2,35 +2,21 @@
 
 # react-lzy-img
 
-A lightweight, high-performance React library for lazy loading images with TypeScript support. Includes components for both standard images and responsive pictures, with built-in fade-in animations and blur-up placeholder support.
+A lightweight React library for lazy loading images with TypeScript support, fade-in animations, and advanced placeholder options including Blurhash and LQIP.
 
-> **~1.7 KB gzipped (ESM)** | **~1.5 KB gzipped (CJS)** | **Tree-shakeable** | **TypeScript-first**
+> **~3.3 KB gzipped (ESM)** | **~2.9 KB gzipped (CJS)** | **Tree-shakeable** | **TypeScript-first**
 
 ## Features
 
-
-**High Performance**
-- Uses the native Intersection Observer API for efficient viewport detection
-- **Automatic native lazy loading fallback:** If Intersection Observer is unavailable, falls back to browser-native `<img loading="lazy">` for best compatibility
-- React 17+ compatible, works with React 18 and 19
-- Extremely lightweight with zero production dependencies
-- Automatically injects optimized CSS at runtime
-
-**Developer Experience**
-- Fully typed with TypeScript
-- Simple, intuitive component API
-- Automatic fade-in transitions
-- Blur-up placeholder effect support
-- Support for responsive images via `srcSet` and `sizes`
-
-**Components & Hooks**
-- `LazyImage` component for simple images
-- `LazyPicture` component for responsive images
-- Custom hooks (`useLazyLoad`, `useLazyImage`) for advanced use cases
-- Customizable fade-in duration and easing
-- Intersection Observer options (rootMargin, threshold)
-- onLoad callback support
-- Works inside scrollable containers
+- **Intersection Observer API** with automatic native lazy loading fallback
+- **Responsive images** with `<picture>` element and `srcSet` support  
+- **Multiple placeholder types**: Blurhash, LQIP, and regular images
+- **Customizable fade-in transitions** with configurable duration
+- **Priority loading** for critical images with eager loading
+- **Full accessibility support** with ARIA props
+- **Error handling** with custom fallback components
+- **TypeScript-first** with complete type coverage
+- **Zero dependencies** except for optional blurhash decoding
 
 ## Installation
 
@@ -40,91 +26,61 @@ npm i react-lzy-img
 
 ## Quick Start
 
-### LazyImage Component
-
 ```tsx
-import { LazyImage } from 'react-lzy-img';
+import { LazyImage, LazyPicture } from 'react-lzy-img';
 
-export default function MyComponent() {
-  return (
-    <LazyImage
-      src="https://example.com/image.jpg"
-      alt="A lazy loaded image"
-      placeholder="https://example.com/image-thumb.jpg"
-      fadeIn
-      fadeInDuration={400}
-      width={600}
-      height={400}
-      onLoad={() => console.log('Image loaded!')}
-    />
-  );
-}
+// Basic lazy image
+<LazyImage
+  src="/image.jpg"
+  alt="Description"
+  placeholder="/thumb.jpg"
+  width={600}
+  height={400}
+/>
+
+// Responsive image with blurhash
+<LazyPicture
+  src="/large.jpg"
+  srcSet="/small.jpg 400w, /large.jpg 800w" 
+  sizes="(max-width: 600px) 100vw, 800px"
+  alt="Responsive image"
+  blurhash="LEHV6nWB2yk8pyo0adR*.7kCMdnj"
+  aspectRatio={16/9}
+/>
 ```
-
-### LazyPicture Component (Responsive)
-
-```tsx
-import { LazyPicture } from 'react-lzy-img';
-
-export default function ResponsiveImage() {
-  return (
-    <LazyPicture
-      src="https://example.com/image-large.jpg"
-      alt="A responsive image"
-      srcSet="https://example.com/image-small.jpg 400w, https://example.com/image-large.jpg 800w"
-      sizes="(max-width: 600px) 100vw, 800px"
-      placeholder="https://example.com/image-thumb.jpg"
-      placeholderBlur
-      aspectRatio={2}
-      width={800}
-      fadeInDuration={1200}
-      onLoad={() => console.log('Picture loaded!')}
-    />
-  );
-}
 ```
 
 ## API Reference
-
 
 ### LazyImage Props
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `src` | `string` | **required** | The image source URL |
+| `src` | `string` | **required** | Image source URL |
 | `alt` | `string` | **required** | Alt text for accessibility |
-| `placeholder` | `string` | undefined | Blur-up placeholder image URL |
-| `blurhash` | `string` | undefined | Blurhash string for ultra-light blurred placeholder |
-| `lqip` | `string` | undefined | Base64-encoded low-quality image placeholder |
+| `placeholder` | `string` | - | Placeholder image URL |
+| `blurhash` | `string` | - | Blurhash string for blurred placeholder |
+| `lqip` | `string` | - | Base64 low-quality image placeholder |
 | `fadeIn` | `boolean` | `true` | Enable fade-in transition |
-| `fadeInDuration` | `number` | `300` | Fade-in duration in milliseconds |
-| `width` | `number` | undefined | Container width (in pixels) |
-| `height` | `number` | undefined | Container height (in pixels) |
-| `aspectRatio` | `number` | undefined | Aspect ratio (e.g., `16/9`) |
-| `className` | `string` | undefined | Additional CSS classes |
-| `style` | `CSSProperties` | undefined | Inline styles |
-| `rootMargin` | `string` | `'200px'` | Intersection Observer rootMargin |
+| `fadeInDuration` | `number` | `300` | Fade duration in milliseconds |
+| `priority` | `boolean` | `false` | Load immediately (skip lazy loading) |
+| `preloadMargin` | `string` | `'200px'` | Viewport margin to trigger loading |
 | `forceVisible` | `boolean` | `false` | Skip lazy loading, load immediately |
-| `onLoad` | `() => void` | undefined | Callback when image loads |
-| `onError` | `(event) => void` | undefined | Callback when image fails to load |
-| `fallback` | `React.ReactNode \| string` | undefined | Custom fallback UI or message if image fails to load |
-| `role` | `string` | undefined | ARIA role for the `<img>` element (e.g., `presentation`, `img`) |
-| `ariaLabel` | `string` | undefined | ARIA label for the image (sets `aria-label` on `<img>`) |
-| `ariaDescribedby` | `string` | undefined | ARIA describedby for the image (sets `aria-describedby` on `<img>`) |
-
+| `width` / `height` | `number` | - | Container dimensions |
+| `aspectRatio` | `number` | - | Aspect ratio (e.g., `16/9`) |
+| `onLoad` / `onError` | `function` | - | Event callbacks |
+| `fallback` | `ReactNode \| string` | - | Custom error fallback |
+| `role` / `ariaLabel` / `ariaDescribedby` | `string` | - | Accessibility props |
 
 ### LazyPicture Props
 
-Extends `LazyImage` props with:
+Extends `LazyImage` with:
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `srcSet` | `string` | undefined | Responsive image sources |
-| `sizes` | `string` | undefined | Responsive image sizes |
-| `priority` | `boolean` | `false` | Load immediately (eager loading) |
-| `placeholderBlur` | `boolean` | `false` | Show blurred placeholder |
-| `blurhash` | `string` | undefined | Blurhash string for ultra-light blurred placeholder |
-| `lqip` | `string` | undefined | Base64-encoded low-quality image placeholder |
+| Prop | Type | Description |
+|------|------|-------------|
+| `srcSet` | `string` | Responsive image sources |
+| `sizes` | `string` | Responsive image sizes |
+| `placeholderBlur` | `boolean` | Show blurred regular placeholder |
 ### Blurhash & LQIP Placeholders
 
 **Blurhash** is a tiny string that encodes a blurred, colorful preview of your image. It’s decoded in the browser and shown as a fast, visually appealing placeholder while the real image loads. Extremely lightweight and used by sites like Unsplash.
@@ -195,95 +151,59 @@ Both `LazyImage` and `LazyPicture` support ARIA and accessibility props for impr
 - Use `ariaLabel` for custom screen reader text if needed.
 - Use `ariaDescribedby` to reference additional descriptive content elsewhere on the page.
 
-### Custom Hooks
+### Placeholder Types
 
-**useLazyLoad** - Manage lazy loading with custom content:
+**Priority order:** `blurhash` → `lqip` → `placeholder`
+
+- **Blurhash**: Ultra-lightweight blurred preview (requires decode)
+- **LQIP**: Base64-encoded low-quality image  
+- **Placeholder**: Regular image URL with optional blur effect
 
 ```tsx
-import { useLazyLoad } from 'react-lzy-img';
+// Blurhash placeholder
+<LazyImage src="/image.jpg" blurhash="LEHV6nWB2yk8pyo0adR*.7kCMdnj" />
 
-const [ref, isInView] = useLazyLoad({ rootMargin: '100px' });
+// LQIP placeholder  
+<LazyImage src="/image.jpg" lqip="data:image/jpeg;base64,/9j/..." />
+
+// Regular placeholder with blur
+<LazyPicture src="/image.jpg" placeholder="/thumb.jpg" placeholderBlur />
 ```
 
-**useLazyImage** - Manage lazy-loaded image sources:
+### Custom Hooks
 
 ```tsx
-import { useLazyImage } from 'react-lzy-img';
+import { useLazyLoad, useLazyImage } from 'react-lzy-img';
 
-const [ref, src] = useLazyImage({
-  src: 'https://example.com/full.jpg',
-  placeholderSrc: 'https://example.com/thumb.jpg',
+// Custom lazy loading logic
+const [elementRef, isInView] = useLazyLoad({ preloadMargin: '100px' });
+
+// Lazy image source management
+const [imageRef, imageSrc] = useLazyImage({
+  src: '/full-image.jpg',
+  placeholderSrc: '/thumbnail.jpg'
 });
 ```
 
+### Error Handling
+
+```tsx
+<LazyImage
+  src="/might-fail.jpg"
+  alt="Image that might fail"
+  fallback="Image failed to load"
+  onError={(e) => console.log('Load failed:', e)}
+/>
+```
 
 ## Styling
 
-CSS styles are automatically injected at runtime. Override using these class names:
+CSS is automatically injected. Override with:
 
-- `.LazyImage-img` - The main image
-- `.LazyImage-placeholder` - The placeholder image
-- `.LazyImage-fade` - Fade-in animation
-- `.LazyImage-fallback` - Error/fallback message container
-- `.grid-stack` and `.stack-item` - Grid stacking
-### Error Handling & Fallback Example
-
-If the image fails to load, you can show a custom fallback message or React node:
-
-```tsx
-<LazyImage
-  src="/broken.jpg"
-  alt="Broken image"
-  fallback="Could not load image."
-  width={300}
-  height={200}
-/>
-
-// Or with a custom React node:
-<LazyImage
-  src="/broken.jpg"
-  alt="Broken image"
-  fallback={<div style={{ color: 'orange' }}>⚠️ Custom error: image missing!</div>}
-  width={300}
-  height={200}
-/>
-```
-
-
-## Browser Support
-
-Modern browsers with `IntersectionObserver` support. If Intersection Observer is unavailable, the library automatically falls back to native browser lazy loading using `<img loading="lazy">`.
-
-
-## Performance
-
-- Bundle size: ~1.7 KB gzipped (ESM), ~1.5 KB gzipped (CJS)
-- Tree-shakeable ESM exports
-- Uses native IntersectionObserver API with automatic native lazy fallback
-
-## Examples
-
-### Image Gallery
-
-```tsx
-const images = ['/img1.jpg', '/img2.jpg', '/img3.jpg'];
-
-export default function Gallery() {
-  return (
-    <div className="grid">
-      {images.map((src) => (
-        <LazyImage
-          key={src}
-          src={src}
-          alt="Gallery item"
-          width={300}
-          height={300}
-        />
-      ))}
-    </div>
-  );
-}
-```
+- `.LazyImage-img` - Main image
+- `.LazyImage-placeholder` - Placeholder image  
+- `.LazyImage-fade` - Fade animation
+- `.LazyImage-fallback` - Error fallback
 
 ## License
 
