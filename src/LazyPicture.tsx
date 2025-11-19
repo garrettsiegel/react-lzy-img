@@ -25,6 +25,9 @@ export default function LazyPicture(props: Props) {
     fallback,
     blurhash,
     lqip,
+    role,
+    ariaLabel,
+    ariaDescribedby,
   } = props;
 
   const blurhashRef = useRef<HTMLCanvasElement>(null);
@@ -154,6 +157,9 @@ export default function LazyPicture(props: Props) {
                 onError={e => { setHasError(true); onError?.(e); }}
                 className={`LazyImage-img${fadeIn ? ' LazyImage-fade' : ''}`}
                 style={fadeStyle(isLoaded)}
+                role={role}
+                aria-label={ariaLabel}
+                aria-describedby={ariaDescribedby}
               />
             </picture>
           </>}
@@ -221,6 +227,9 @@ export default function LazyPicture(props: Props) {
                 onError={e => { setHasError(true); onError?.(e); }}
                 className={`LazyImage-img${fadeIn ? ' LazyImage-fade' : ''}`}
                 style={fadeStyle(isLoaded)}
+                role={role}
+                aria-label={ariaLabel}
+                aria-describedby={ariaDescribedby}
               />
             </picture>
           )}

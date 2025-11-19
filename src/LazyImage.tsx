@@ -21,6 +21,9 @@ export default function LazyImage(props: Props) {
     blurhash,
     lqip,
     rootMargin = '200px',
+    role,
+    ariaLabel,
+    ariaDescribedby,
   } = props;
 
 
@@ -131,6 +134,9 @@ export default function LazyImage(props: Props) {
               onError={e => { setHasError(true); onError?.(e); }}
               className={`LazyImage-img stack-item${fadeIn ? ' LazyImage-fade' : ''}`}
               style={fadeStyle(isLoaded)}
+              role={role}
+              aria-label={ariaLabel}
+              aria-describedby={ariaDescribedby}
             />
           </>}
         </div>
@@ -188,6 +194,9 @@ export default function LazyImage(props: Props) {
               onError={e => { setHasError(true); onError?.(e); }}
               className={`LazyImage-img stack-item${fadeIn ? ' LazyImage-fade' : ''}`}
               style={fadeStyle(isLoaded)}
+              role={role}
+              aria-label={ariaLabel}
+              aria-describedby={ariaDescribedby}
             />
           )}
         </>}

@@ -108,6 +108,9 @@ export default function ResponsiveImage() {
 | `onLoad` | `() => void` | undefined | Callback when image loads |
 | `onError` | `(event) => void` | undefined | Callback when image fails to load |
 | `fallback` | `React.ReactNode \| string` | undefined | Custom fallback UI or message if image fails to load |
+| `role` | `string` | undefined | ARIA role for the `<img>` element (e.g., `presentation`, `img`) |
+| `ariaLabel` | `string` | undefined | ARIA label for the image (sets `aria-label` on `<img>`) |
+| `ariaDescribedby` | `string` | undefined | ARIA describedby for the image (sets `aria-describedby` on `<img>`) |
 
 
 ### LazyPicture Props
@@ -151,6 +154,46 @@ If both `blurhash` and `lqip` are provided, `blurhash` is used. If neither is pr
 ```
 | `onError` | `(event) => void` | undefined | Callback when image fails to load |
 | `fallback` | `React.ReactNode \| string` | undefined | Custom fallback UI or message if image fails to load |
+| `role` | `string` | undefined | ARIA role for the `<img>` element (e.g., `presentation`, `img`) |
+| `ariaLabel` | `string` | undefined | ARIA label for the image (sets `aria-label` on `<img>`) |
+| `ariaDescribedby` | `string` | undefined | ARIA describedby for the image (sets `aria-describedby` on `<img>`) |
+## Accessibility (ARIA Support)
+
+Both `LazyImage` and `LazyPicture` support ARIA and accessibility props for improved screen reader and assistive technology support:
+
+| Prop | Description |
+|------|-------------|
+| `role` | Sets the ARIA role on the `<img>` (e.g., `presentation` for decorative images, `img` for meaningful content) |
+| `ariaLabel` | Sets the `aria-label` attribute on the `<img>` for custom screen reader text |
+| `ariaDescribedby` | Sets the `aria-describedby` attribute on the `<img>` for referencing additional descriptive content |
+
+**Usage Example:**
+
+```tsx
+<LazyImage
+  src="/logo.png"
+  alt="Company logo"
+  role="img"
+  ariaLabel="Acme Corp logo"
+  width={120}
+  height={40}
+/>
+
+// Decorative image (ignored by screen readers):
+<LazyImage
+  src="/divider.png"
+  alt=""
+  role="presentation"
+  width={800}
+  height={2}
+/>
+```
+
+**Best Practices:**
+- Always provide a meaningful `alt` text for important images.
+- Use `role="presentation"` and `alt=""` for purely decorative images.
+- Use `ariaLabel` for custom screen reader text if needed.
+- Use `ariaDescribedby` to reference additional descriptive content elsewhere on the page.
 
 ### Custom Hooks
 

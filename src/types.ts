@@ -16,6 +16,9 @@ export type Props = {
   blurhash?: string;
   lqip?: string;
   rootMargin?: string;
+  role?: string;
+  ariaLabel?: string;
+  ariaDescribedby?: string;
 };
 
 export interface LazyPictureProps extends Omit<React.ImgHTMLAttributes<HTMLImageElement>, 'srcSet' | 'sizes'> {
@@ -38,4 +41,7 @@ export interface LazyPictureProps extends Omit<React.ImgHTMLAttributes<HTMLImage
   fallback?: React.ReactNode | string;
   blurhash?: string;
   lqip?: string;
+  role?: string;
+  ariaLabel?: string;
+  ariaDescribedby?: string;
 }
