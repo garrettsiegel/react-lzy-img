@@ -15,12 +15,15 @@ export default function LazyImage(props: Props) {
     style = {},
     forceVisible = false,
     onLoad,
+    onError,
+    fallback,
     rootMargin = '200px',
   } = props;
 
   const ref = useRef<HTMLDivElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isInView, setIsInView] = useState(forceVisible);
+  const [hasError, setHasError] = useState(false);
 
   // Native lazy fallback: if IntersectionObserver is not available, always show image with loading="lazy"
   const hasNativeLazy = typeof window !== 'undefined' && !('IntersectionObserver' in window);
@@ -59,6 +62,47 @@ export default function LazyImage(props: Props) {
     return (
       <div className={`LazyImage-wrapper${className ? ' ' + className : ''}`} style={sizeStyle}>
         <div className="grid-stack">
+          {hasError ? (
+            fallback ? (
+              typeof fallback === 'string' ? <div className="LazyImage-fallback">{fallback}</div> : fallback
+            ) : (
+              <div className="LazyImage-fallback">Image failed to load.</div>
+            )
+          ) : <>
+            {placeholder && !isLoaded && (
+              <img
+                src={placeholder}
+                alt=""
+                aria-hidden="true"
+                className={`LazyImage-placeholder stack-item${fadeIn ? ' LazyImage-fade' : ''}`}
+                style={fadeStyle(false)}
+              />
+            )}
+            <img
+              src={src}
+              alt={alt}
+              loading="lazy"
+              onLoad={() => { setIsLoaded(true); onLoad?.(); }}
+              onError={e => { setHasError(true); onError?.(e); }}
+              className={`LazyImage-img stack-item${fadeIn ? ' LazyImage-fade' : ''}`}
+              style={fadeStyle(isLoaded)}
+            />
+          </>}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div ref={ref} className={`LazyImage-wrapper${className ? ' ' + className : ''}`} style={sizeStyle}>
+      <div className="grid-stack">
+        {hasError ? (
+          fallback ? (
+            typeof fallback === 'string' ? <div className="LazyImage-fallback">{fallback}</div> : fallback
+          ) : (
+            <div className="LazyImage-fallback">Image failed to load.</div>
+          )
+        ) : <>
           {placeholder && !isLoaded && (
             <img
               src={placeholder}
@@ -68,41 +112,18 @@ export default function LazyImage(props: Props) {
               style={fadeStyle(false)}
             />
           )}
-          <img
-            src={src}
-            alt={alt}
-            loading="lazy"
-            onLoad={() => { setIsLoaded(true); onLoad?.(); }}
-            className={`LazyImage-img stack-item${fadeIn ? ' LazyImage-fade' : ''}`}
-            style={fadeStyle(isLoaded)}
-          />
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div ref={ref} className={`LazyImage-wrapper${className ? ' ' + className : ''}`} style={sizeStyle}>
-      <div className="grid-stack">
-        {placeholder && !isLoaded && (
-          <img
-            src={placeholder}
-            alt=""
-            aria-hidden="true"
-            className={`LazyImage-placeholder stack-item${fadeIn ? ' LazyImage-fade' : ''}`}
-            style={fadeStyle(false)}
-          />
-        )}
-        {isInView && (
-          <img
-            src={src}
-            alt={alt}
-            loading="lazy"
-            onLoad={() => { setIsLoaded(true); onLoad?.(); }}
-            className={`LazyImage-img stack-item${fadeIn ? ' LazyImage-fade' : ''}`}
-            style={fadeStyle(isLoaded)}
-          />
-        )}
+          {isInView && (
+            <img
+              src={src}
+              alt={alt}
+              loading="lazy"
+              onLoad={() => { setIsLoaded(true); onLoad?.(); }}
+              onError={e => { setHasError(true); onError?.(e); }}
+              className={`LazyImage-img stack-item${fadeIn ? ' LazyImage-fade' : ''}`}
+              style={fadeStyle(isLoaded)}
+            />
+          )}
+        </>}
       </div>
     </div>
   );

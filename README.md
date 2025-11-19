@@ -86,6 +86,7 @@ export default function ResponsiveImage() {
 
 ## API Reference
 
+
 ### LazyImage Props
 
 | Prop | Type | Default | Description |
@@ -103,6 +104,9 @@ export default function ResponsiveImage() {
 | `rootMargin` | `string` | `'200px'` | Intersection Observer rootMargin |
 | `forceVisible` | `boolean` | `false` | Skip lazy loading, load immediately |
 | `onLoad` | `() => void` | undefined | Callback when image loads |
+| `onError` | `(event) => void` | undefined | Callback when image fails to load |
+| `fallback` | `React.ReactNode \| string` | undefined | Custom fallback UI or message if image fails to load |
+
 
 ### LazyPicture Props
 
@@ -114,6 +118,8 @@ Extends `LazyImage` props with:
 | `sizes` | `string` | undefined | Responsive image sizes |
 | `priority` | `boolean` | `false` | Load immediately (eager loading) |
 | `placeholderBlur` | `boolean` | `false` | Show blurred placeholder |
+| `onError` | `(event) => void` | undefined | Callback when image fails to load |
+| `fallback` | `React.ReactNode \| string` | undefined | Custom fallback UI or message if image fails to load |
 
 ### Custom Hooks
 
@@ -136,6 +142,7 @@ const [ref, src] = useLazyImage({
 });
 ```
 
+
 ## Styling
 
 CSS styles are automatically injected at runtime. Override using these class names:
@@ -143,7 +150,30 @@ CSS styles are automatically injected at runtime. Override using these class nam
 - `.LazyImage-img` - The main image
 - `.LazyImage-placeholder` - The placeholder image
 - `.LazyImage-fade` - Fade-in animation
+- `.LazyImage-fallback` - Error/fallback message container
 - `.grid-stack` and `.stack-item` - Grid stacking
+### Error Handling & Fallback Example
+
+If the image fails to load, you can show a custom fallback message or React node:
+
+```tsx
+<LazyImage
+  src="/broken.jpg"
+  alt="Broken image"
+  fallback="Could not load image."
+  width={300}
+  height={200}
+/>
+
+// Or with a custom React node:
+<LazyImage
+  src="/broken.jpg"
+  alt="Broken image"
+  fallback={<div style={{ color: 'orange' }}>⚠️ Custom error: image missing!</div>}
+  width={300}
+  height={200}
+/>
+```
 
 
 ## Browser Support
