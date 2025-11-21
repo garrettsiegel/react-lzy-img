@@ -1,26 +1,51 @@
 import { useRef, useState, useEffect } from 'react';
+import type { SyntheticEvent } from 'react';
 import { decode } from 'blurhash';
 import './injectStyle';
+import { useLazyLoad } from './useLazyLoad';
 import type { LazyPictureProps as Props } from './types';
 
 export default function LazyPicture(props: Props) {
   const {
-    src, alt, srcSet, sizes, placeholder, placeholderBlur = false, aspectRatio,
-    fadeIn = true, fadeInDuration = 300, priority = false, className = '',
-    width, height, style = {}, preloadMargin = '200px', onLoad, onError,
-    fallback, blurhash, lqip, role, ariaLabel, ariaDescribedby,
+    src,
+    alt,
+    srcSet,
+    sizes,
+    placeholder,
+    placeholderBlur = false,
+    aspectRatio,
+    fadeIn = true,
+    fadeInDuration = 300,
+    priority = false,
+    forceVisible = false,
+    className = '',
+    width,
+    height,
+    style = {},
+    preloadMargin = '200px',
+    fallback,
+    blurhash,
+    lqip,
+    ariaLabel,
+    ariaDescribedby,
+    loading: loadingProp,
+    onLoad,
+    onError,
+    ...imgProps
   } = props;
 
-  const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const imageRef = useRef<HTMLImageElement>(null);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [isInView, setIsInView] = useState(priority);
-  const [hasError, setHasError] = useState(false);
-
-  const hasIntersectionObserver = typeof window !== 'undefined' && 'IntersectionObserver' in window;
-  const shouldShowImage = isInView;
-  const imageLoading = priority ? 'eager' : 'lazy';
+  const [containerRef, observedInView] = useLazyLoad<HTMLDivElement>({
+    preloadMargin,
+  });
+  const assetKey = [src, srcSet ?? '', sizes ?? ''].join('|');
+  const [loadedKey, setLoadedKey] = useState<string | null>(null);
+  const [erroredKey, setErroredKey] = useState<string | null>(null);
+  const isLoaded = loadedKey === assetKey;
+  const hasError = erroredKey === assetKey;
+  const shouldForceVisible = forceVisible || priority;
+  const shouldShowImage = shouldForceVisible || observedInView || isLoaded;
+  const imageLoading = loadingProp ?? (priority ? 'eager' : 'lazy');
 
   // Draw blurhash placeholder
   useEffect(() => {
@@ -39,54 +64,31 @@ export default function LazyPicture(props: Props) {
     }
   }, [blurhash, isLoaded]);
 
-  // Setup intersection observer for lazy loading
-  useEffect(() => {
-    if (priority || !containerRef.current) return;
-    
-    if (hasIntersectionObserver) {
-      const observer = new IntersectionObserver(
-        ([entry]) => entry.isIntersecting && (setIsInView(true), observer.disconnect()),
-        { rootMargin: preloadMargin }
-      );
-      observer.observe(containerRef.current);
-      return () => observer.disconnect();
-    } else {
-      setTimeout(() => setIsInView(true), 0);
-    }
-  }, [priority, preloadMargin, hasIntersectionObserver]);
-
-  // Check image load status for responsive images
-  useEffect(() => {
-    if (!isInView) return;
-    
-    const checkImageStatus = () => {
-      const image = imageRef.current;
-      return image?.complete && image.naturalWidth > 0 && (setIsLoaded(true), true);
-    };
-    
-    if (checkImageStatus()) return;
-    
-    const intervalId = setInterval(checkImageStatus, 100);
-    const timeoutId = setTimeout(() => clearInterval(intervalId), 5000);
-    return () => (clearInterval(intervalId), clearTimeout(timeoutId));
-  }, [isInView, src, srcSet]);
-
   const containerStyle = {
-    width, height,
+    width,
+    height,
     ...(aspectRatio && { aspectRatio: String(aspectRatio) }),
     ...style,
   };
 
-  const fadeStyle = (loaded: boolean) => fadeIn 
+  const fadeStyle = (loaded: boolean) => (fadeIn
     ? { opacity: loaded ? 1 : 0, transition: `opacity ${fadeInDuration}ms ease-in-out` }
-    : { opacity: 1 };
+    : { opacity: 1 });
 
   const wrapperClass = `LazyPicture-wrapper${className ? ' ' + className : ''}`;
   const placeholderClass = `LazyImage-placeholder stack-item${fadeIn ? ' LazyImage-fade' : ''}`;
-  const imageClass = `LazyImage-img${fadeIn ? ' LazyImage-fade' : ''}`;
+  const imageClass = `LazyImage-img stack-item${fadeIn ? ' LazyImage-fade' : ''}`;
 
-  const handleLoad = (event: React.SyntheticEvent<HTMLImageElement>) => (setIsLoaded(true), onLoad?.(event));
-  const handleError = (event: React.SyntheticEvent<HTMLImageElement>) => (setHasError(true), onError?.(event));
+  const handleLoad = (event: SyntheticEvent<HTMLImageElement>) => {
+    setLoadedKey(assetKey);
+    setErroredKey(null);
+    onLoad?.(event);
+  };
+
+  const handleError = (event: SyntheticEvent<HTMLImageElement>) => {
+    setErroredKey(assetKey);
+    onError?.(event);
+  };
 
   const renderPlaceholder = () => {
     if (blurhash && !isLoaded) {
@@ -101,7 +103,7 @@ export default function LazyPicture(props: Props) {
         />
       );
     }
-    
+
     const shouldShowPlaceholder = !blurhash && !isLoaded && (lqip || (placeholderBlur && placeholder));
     if (shouldShowPlaceholder) {
       return (
@@ -114,7 +116,7 @@ export default function LazyPicture(props: Props) {
         />
       );
     }
-    
+
     return null;
   };
 
@@ -130,7 +132,7 @@ export default function LazyPicture(props: Props) {
     <picture className="stack-item" style={{ width: '100%', height: '100%' }}>
       {srcSet && <source srcSet={srcSet} sizes={sizes} />}
       <img
-        ref={imageRef}
+        {...imgProps}
         src={src}
         alt={alt}
         srcSet={srcSet}
@@ -140,9 +142,8 @@ export default function LazyPicture(props: Props) {
         onError={handleError}
         className={imageClass}
         style={fadeStyle(isLoaded)}
-        role={role}
-        aria-label={ariaLabel}
-        aria-describedby={ariaDescribedby}
+        {...(ariaLabel ? { 'aria-label': ariaLabel } : {})}
+        {...(ariaDescribedby ? { 'aria-describedby': ariaDescribedby } : {})}
       />
     </picture>
   );

@@ -1,27 +1,48 @@
 import { useRef, useState, useEffect } from 'react';
+import type { SyntheticEvent } from 'react';
 import { decode } from 'blurhash';
 import './injectStyle';
-import type { Props } from './types';
+import { useLazyLoad } from './useLazyLoad';
+import type { LazyImageProps } from './types';
 
-export default function LazyImage(props: Props) {
+export default function LazyImage(props: LazyImageProps) {
   const {
-    src, alt, placeholder, fadeIn = true, fadeInDuration = 300, className = '',
-    width, height, aspectRatio, style = {}, forceVisible = false, onLoad, onError,
-    fallback, blurhash, lqip, preloadMargin = '200px', priority = false,
-    role, ariaLabel, ariaDescribedby,
+    src,
+    alt,
+    placeholder,
+    fadeIn = true,
+    fadeInDuration = 300,
+    className = '',
+    width,
+    height,
+    aspectRatio,
+    style = {},
+    forceVisible = false,
+    fallback,
+    blurhash,
+    lqip,
+    preloadMargin = '200px',
+    priority = false,
+    ariaLabel,
+    ariaDescribedby,
+    loading: loadingProp,
+    onLoad,
+    onError,
+    ...imgProps
   } = props;
 
-  const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [isInView, setIsInView] = useState(forceVisible || priority);
-  const [hasError, setHasError] = useState(false);
+  const [containerRef, observedInView] = useLazyLoad<HTMLDivElement>({
+    preloadMargin,
+  });
+  const [loadedSrc, setLoadedSrc] = useState<string | null>(null);
+  const [erroredSrc, setErroredSrc] = useState<string | null>(null);
+  const isLoaded = loadedSrc === src;
+  const hasError = erroredSrc === src;
+  const shouldForceVisible = forceVisible || priority;
+  const shouldShowImage = shouldForceVisible || observedInView || isLoaded;
+  const imageLoading = loadingProp ?? (priority ? 'eager' : 'lazy');
 
-  const hasIntersectionObserver = typeof window !== 'undefined' && 'IntersectionObserver' in window;
-  const shouldShowImage = priority || isInView;
-  const imageLoading = priority ? 'eager' : 'lazy';
-
-  // Draw blurhash placeholder
   useEffect(() => {
     if (!blurhash || !canvasRef.current || isLoaded) return;
     try {
@@ -34,42 +55,35 @@ export default function LazyImage(props: Props) {
         context.putImageData(imageData, 0, 0);
       }
     } catch {
-      // Blurhash decode failed, fallback to other placeholders
+      // Ignore blurhash decode failures
     }
   }, [blurhash, isLoaded]);
 
-  // Setup intersection observer for lazy loading
-  useEffect(() => {
-    if (priority || forceVisible || !containerRef.current) return;
-    
-    if (hasIntersectionObserver) {
-      const observer = new IntersectionObserver(
-        ([entry]) => entry.isIntersecting && (setIsInView(true), observer.disconnect()),
-        { rootMargin: preloadMargin }
-      );
-      observer.observe(containerRef.current);
-      return () => observer.disconnect();
-    } else {
-      setTimeout(() => setIsInView(true), 0);
-    }
-  }, [priority, forceVisible, preloadMargin, hasIntersectionObserver]);
-
   const containerStyle = {
-    width, height,
+    width,
+    height,
     ...(aspectRatio && { aspectRatio: String(aspectRatio) }),
     ...style,
   };
 
-  const fadeStyle = (loaded: boolean) => fadeIn 
+  const fadeStyle = (loaded: boolean) => (fadeIn
     ? { opacity: loaded ? 1 : 0, transition: `opacity ${fadeInDuration}ms ease-in-out` }
-    : { opacity: 1 };
+    : { opacity: 1 });
 
   const wrapperClass = `LazyImage-wrapper${className ? ' ' + className : ''}`;
   const placeholderClass = `LazyImage-placeholder stack-item${fadeIn ? ' LazyImage-fade' : ''}`;
   const imageClass = `LazyImage-img stack-item${fadeIn ? ' LazyImage-fade' : ''}`;
 
-  const handleLoad = () => (setIsLoaded(true), onLoad?.());
-  const handleError = (event: React.SyntheticEvent<HTMLImageElement>) => (setHasError(true), onError?.(event));
+  const handleLoad = (event: SyntheticEvent<HTMLImageElement>) => {
+    setLoadedSrc(src);
+    setErroredSrc(null);
+    onLoad?.(event);
+  };
+
+  const handleError = (event: SyntheticEvent<HTMLImageElement>) => {
+    setErroredSrc(src);
+    onError?.(event);
+  };
 
   const renderPlaceholder = () => {
     if (blurhash && !isLoaded) {
@@ -84,7 +98,7 @@ export default function LazyImage(props: Props) {
         />
       );
     }
-    
+
     const placeholderSrc = lqip || placeholder;
     if (placeholderSrc && !isLoaded) {
       return (
@@ -97,7 +111,7 @@ export default function LazyImage(props: Props) {
         />
       );
     }
-    
+
     return null;
   };
 
@@ -111,6 +125,7 @@ export default function LazyImage(props: Props) {
 
   const renderImage = () => shouldShowImage && (
     <img
+      {...imgProps}
       src={src}
       alt={alt}
       loading={imageLoading}
@@ -118,9 +133,8 @@ export default function LazyImage(props: Props) {
       onError={handleError}
       className={imageClass}
       style={fadeStyle(isLoaded)}
-      role={role}
-      aria-label={ariaLabel}
-      aria-describedby={ariaDescribedby}
+      {...(ariaLabel ? { 'aria-label': ariaLabel } : {})}
+      {...(ariaDescribedby ? { 'aria-describedby': ariaDescribedby } : {})}
     />
   );
 

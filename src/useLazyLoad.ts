@@ -13,38 +13,51 @@ export function useLazyLoad<T extends HTMLElement = HTMLElement>(
 ): [RefObject<T>, boolean] {
   const elementRef = useRef<T>(null);
   const [isInView, setIsInView] = useState(false);
+  const {
+    root = null,
+    preloadMargin = '200px',
+    threshold = 0,
+    once = true,
+  } = options;
 
   useEffect(() => {
     const element = elementRef.current;
     if (!element) return;
 
-    const hasIntersectionObserver = 'IntersectionObserver' in window;
-    
+    const hasIntersectionObserver = typeof window !== 'undefined' && 'IntersectionObserver' in window;
+    let observer: IntersectionObserver | undefined;
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
     if (hasIntersectionObserver) {
       const handleIntersection = ([entry]: IntersectionObserverEntry[]) => {
-        const shouldSetInView = entry.isIntersecting;
-        const shouldDisconnect = options.once !== false;
-        
-        if (shouldSetInView) {
+        if (entry.isIntersecting) {
           setIsInView(true);
-          if (shouldDisconnect) observer.disconnect();
-        } else if (options.once === false) {
+          if (once !== false) {
+            observer?.disconnect();
+          }
+        } else if (once === false) {
           setIsInView(false);
         }
       };
 
-      const observer = new IntersectionObserver(handleIntersection, {
-        root: options.root || null,
-        rootMargin: options.preloadMargin || '200px',
-        threshold: options.threshold ?? 0,
+      observer = new IntersectionObserver(handleIntersection, {
+        root,
+        rootMargin: preloadMargin,
+        threshold,
       });
 
       observer.observe(element);
-      return () => observer.disconnect();
     } else {
-      setTimeout(() => setIsInView(true), 0);
+      timeoutId = setTimeout(() => setIsInView(true), 0);
     }
-  }, [options.root, options.preloadMargin, options.threshold, options.once]);
+
+    return () => {
+      observer?.disconnect();
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [root, preloadMargin, threshold, once]);
 
   return [elementRef as RefObject<T>, isInView];
 }
@@ -55,14 +68,23 @@ export interface UseLazyImageOptions extends UseLazyLoadOptions {
 }
 
 export function useLazyImage(options: UseLazyImageOptions): [RefObject<HTMLImageElement>, string] {
-  const [imageRef, isInView] = useLazyLoad<HTMLImageElement>(options);
-  const [imageSrc, setImageSrc] = useState(options.placeholderSrc || '');
+  const { src, placeholderSrc, ...lazyOptions } = options;
+  const [imageRef, isInView] = useLazyLoad<HTMLImageElement>(lazyOptions);
+  const [imageSrc, setImageSrc] = useState(placeholderSrc || '');
 
   useEffect(() => {
-    if (isInView) {
-      setTimeout(() => setImageSrc(options.src), 0);
-    }
-  }, [isInView, options.src]);
+    const timeoutId = setTimeout(() => {
+      if (isInView) {
+        setImageSrc(src);
+      } else {
+        setImageSrc(placeholderSrc || '');
+      }
+    }, 0);
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [isInView, src, placeholderSrc]);
 
   return [imageRef, imageSrc];
 }

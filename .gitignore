@@ -25,3 +25,4 @@ dist-ssr
 
 # Package files
 *.tgz
+./github/copilot-instructions.md

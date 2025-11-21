@@ -1,4 +1,16 @@
-export type Props = {
+import type {
+  CSSProperties,
+  ImgHTMLAttributes,
+  ReactNode,
+  SyntheticEvent,
+} from 'react';
+
+type WrappedImgAttributes = Omit<
+  ImgHTMLAttributes<HTMLImageElement>,
+  'src' | 'alt' | 'className' | 'style' | 'width' | 'height' | 'loading' | 'onLoad' | 'onError'
+>;
+
+export interface LazyImageProps extends WrappedImgAttributes {
   src: string;
   alt: string;
   placeholder?: string;
@@ -8,21 +20,21 @@ export type Props = {
   width?: number;
   height?: number;
   aspectRatio?: number;
-  style?: React.CSSProperties;
+  style?: CSSProperties;
   forceVisible?: boolean;
-  onLoad?: () => void;
-  onError?: (event: React.SyntheticEvent<HTMLImageElement, Event>) => void;
-  fallback?: React.ReactNode | string;
+  fallback?: ReactNode | string;
   blurhash?: string;
   lqip?: string;
   preloadMargin?: string;
   priority?: boolean;
-  role?: string;
   ariaLabel?: string;
   ariaDescribedby?: string;
-};
+  loading?: ImgHTMLAttributes<HTMLImageElement>['loading'];
+  onLoad?: (event: SyntheticEvent<HTMLImageElement>) => void;
+  onError?: (event: SyntheticEvent<HTMLImageElement>) => void;
+}
 
-export interface LazyPictureProps extends Omit<React.ImgHTMLAttributes<HTMLImageElement>, 'srcSet' | 'sizes'> {
+export interface LazyPictureProps extends WrappedImgAttributes {
   src: string;
   alt: string;
   srcSet?: string;
@@ -33,16 +45,20 @@ export interface LazyPictureProps extends Omit<React.ImgHTMLAttributes<HTMLImage
   fadeIn?: boolean;
   fadeInDuration?: number;
   priority?: boolean;
+  forceVisible?: boolean;
   className?: string;
   width?: number;
   height?: number;
-  style?: React.CSSProperties;
+  style?: CSSProperties;
   preloadMargin?: string;
-  onError?: (event: React.SyntheticEvent<HTMLImageElement, Event>) => void;
-  fallback?: React.ReactNode | string;
+  fallback?: ReactNode | string;
   blurhash?: string;
   lqip?: string;
-  role?: string;
   ariaLabel?: string;
   ariaDescribedby?: string;
+  loading?: ImgHTMLAttributes<HTMLImageElement>['loading'];
+  onLoad?: (event: SyntheticEvent<HTMLImageElement>) => void;
+  onError?: (event: SyntheticEvent<HTMLImageElement>) => void;
 }
+
+export type Props = LazyImageProps;

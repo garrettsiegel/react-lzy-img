@@ -4,15 +4,13 @@ A modern, performant React lazy image and picture component library with TypeScr
 
 ## Features
 
-- **Intersection Observer API** with automatic native lazy loading fallback
-- **Responsive images** with `<picture>` element and `srcSet` support
-- **Multiple placeholder types**: Blurhash, LQIP, and regular images
-- **Customizable fade-in transitions** with configurable duration
-- **Priority loading** for critical images with eager loading
-- **Full accessibility support** with ARIA props
-- **Error handling** with custom fallback components
-- **TypeScript-first** with complete type coverage
-- **Lightweight**: ~3.3 KB gzipped (ESM) | ~2.9 KB gzipped (CJS)
+- Intersection Observer powered lazy loading with native `loading="lazy"` fallback
+- Responsive `<picture>` support plus blurhash, LQIP, or image placeholders
+- Forwards every standard `<img>` attribute (`decoding`, `ref`, custom `aria-*`, etc.)
+- Runtime CSS injection (including fallback styles) keeps bundles lean
+- Priority/force-visible switches stay reactive after initial mount
+- Hooks (`useLazyLoad`, `useLazyImage`) exposed for custom layouts
+- Full TypeScript coverage emitted directly from source so declarations never drift
 
 ## Installation
 
@@ -51,31 +49,29 @@ import { LazyImage, LazyPicture } from 'react-lzy-img';
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `src` | `string` | **required** | Image source URL |
-| `alt` | `string` | **required** | Alt text for accessibility |
-| `placeholder` | `string` | - | Placeholder image URL |
-| `blurhash` | `string` | - | Blurhash string for blurred placeholder |
+| `src` / `alt` | `string` | **required** | Image source and accessible text |
+| `placeholder` | `string` | - | Standard placeholder image URL |
+| `blurhash` | `string` | - | Blurhash string decoded into a canvas |
 | `lqip` | `string` | - | Base64 low-quality image placeholder |
-| `fadeIn` | `boolean` | `true` | Enable fade-in transition |
-| `fadeInDuration` | `number` | `300` | Fade duration in milliseconds |
-| `priority` | `boolean` | `false` | Load immediately (skip lazy loading) |
-| `preloadMargin` | `string` | `'200px'` | Viewport margin to trigger loading |
-| `forceVisible` | `boolean` | `false` | Skip lazy loading, load immediately |
-| `width` / `height` | `number` | - | Container dimensions |
-| `aspectRatio` | `number` | - | Aspect ratio (e.g., `16/9`) |
-| `onLoad` / `onError` | `function` | - | Event callbacks |
-| `fallback` | `ReactNode \| string` | - | Custom error fallback |
-| `role` / `ariaLabel` / `ariaDescribedby` | `string` | - | Accessibility props |
+| `fadeIn` | `boolean` | `true` | Toggle fade transition |
+| `fadeInDuration` | `number` | `300` | Fade duration in ms |
+| `priority` | `boolean` | `false` | Eagerly load (uses `loading="eager"`) |
+| `forceVisible` | `boolean` | `false` | Imperatively skip lazy loading (reactive) |
+| `preloadMargin` | `string` | `'200px'` | IntersectionObserver root margin |
+| `width` / `height` / `aspectRatio` | `number` | - | Layout helpers |
+| `fallback` | `ReactNode` | - | Rendered if the image errors |
+| `ariaLabel` / `ariaDescribedby` | `string` | - | Convenience accessibility aliases |
+| `...imgProps` | `<img>` attrs | - | Any other `<img>` attribute is forwarded |
 
 ### LazyPicture Props
 
-Extends `LazyImage` with:
+Extends every `LazyImage` prop (including `forceVisible`) and adds:
 
 | Prop | Type | Description |
 |------|------|-------------|
-| `srcSet` | `string` | Responsive image sources |
+| `srcSet` | `string` | Responsive image sources passed to `<source>` and `<img>` |
 | `sizes` | `string` | Responsive image sizes |
-| `placeholderBlur` | `boolean` | Show blurred regular placeholder |
+| `placeholderBlur` | `boolean` | Blur regular placeholders when no blurhash/LQIP |
 
 ## Placeholder Types
 
@@ -174,13 +170,19 @@ const [imageRef, imageSrc] = useLazyImage({
 
 ## Styling
 
-CSS is automatically injected. Override with these class names:
+CSS (including `.LazyImage-fallback`) is injected once at runtime. Override with these class names:
 
 - `.LazyImage-img` - Main image
 - `.LazyImage-placeholder` - Placeholder image
 - `.LazyImage-fade` - Fade animation
 - `.LazyImage-fallback` - Error fallback
 
+## Development
+
+- `npm run dev` – Vite dev server
+- `npm run lint` – ESLint flat config
+- `npm run build` – Cross-platform build (cleans `dist`, builds, emits `.d.ts` from `tsc`)
+
 ## License
 
-MIT © [Garrett Siegel](https://github.com/garrettsiegel/react-lzy-img)
+MIT © [Garrett Siegel](https://garrettsiegel.com)
