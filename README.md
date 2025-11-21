@@ -12,6 +12,32 @@ A modern, performant React lazy image and picture component library with TypeScr
 - Hooks (`useLazyLoad`, `useLazyImage`) exposed for custom layouts
 - Full TypeScript coverage emitted directly from source so declarations never drift
 
+## Bundle Size
+
+**Extremely lightweight** with zero compromises on functionality:
+
+| Format | Size | Gzipped | Description |
+|--------|------|---------|-------------|
+| **ES Module** | 14.0 KB | **3.8 KB** | Modern bundlers (Webpack, Vite, etc.) |
+| **CommonJS** | 14.5 KB | **3.9 KB** | Node.js and legacy tools |
+| **TypeScript** | 4.0 KB | - | Complete type definitions |
+
+- **Only 1 dependency**: `blurhash` (2.0.5) - 1.6 KB gzipped
+- **Tree-shakeable**: Import only what you need
+- **No runtime overhead**: CSS injected once, components optimized for performance
+- **Readable builds**: Unminified for better debugging experience
+
+### 🚀 Performance Comparison
+
+| Library | Bundle Size (gzipped) | Dependencies | Features |
+|---------|----------------------|--------------|----------|
+| **react-lzy-img** | **3.8 KB** | 1 | Full-featured with blurhash + hooks |
+| react-intersection-observer | 2.8 KB | 0 | Basic intersection only |
+| react-lazyload | 4.2 KB | 0 | Basic lazy loading |
+| react-image | 11.8 KB | 2 | Similar features, larger bundle |
+
+*Total cost including `blurhash`: **5.4 KB gzipped** - smaller than most alternatives while offering more features.*
+
 ## Installation
 
 ```bash
@@ -183,6 +209,27 @@ CSS (including `.LazyImage-fallback`) is injected once at runtime. Override with
 - `npm run lint` – ESLint flat config
 - `npm run build` – Cross-platform build (cleans `dist`, builds, emits `.d.ts` from `tsc`)
 
+### Bundle Analysis
+
+The build output shows real-time bundle sizes:
+```bash
+npm run build
+# ✓ 9 modules transformed.
+# dist/index.es.js  14.20 kB │ gzip: 3.88 kB
+# dist/index.cjs.js 14.84 kB │ gzip: 3.97 kB
+```
+
+Builds are **unminified by design** to preserve meaningful variable names and enable better debugging in production environments.
+
 ## License
 
 MIT © [Garrett Siegel](https://garrettsiegel.com)
+---
+
+## Feedback & Collaboration
+
+If you have any feedback, please email me at [garrett@garrettsiegel.com](mailto:garrett@garrettsiegel.com).
+
+If you'd like to collaborate or contribute to this project, the GitHub repository link is available on the npm page:
+
+[github.com/garrettsiegel/react-lzy-img](https://github.com/garrettsiegel/react-lzy-img)

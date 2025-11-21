@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { RefObject } from 'react';
+import { DEFAULT_PRELOAD_MARGIN, INTERSECTION_OBSERVER_THRESHOLD } from './constants';
 
 export interface UseLazyLoadOptions {
   root?: Element | null;
@@ -15,8 +16,8 @@ export function useLazyLoad<T extends HTMLElement = HTMLElement>(
   const [isInView, setIsInView] = useState(false);
   const {
     root = null,
-    preloadMargin = '200px',
-    threshold = 0,
+    preloadMargin = DEFAULT_PRELOAD_MARGIN,
+    threshold = INTERSECTION_OBSERVER_THRESHOLD,
     once = true,
   } = options;
 

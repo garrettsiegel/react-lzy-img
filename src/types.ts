@@ -61,4 +61,3 @@ export interface LazyPictureProps extends WrappedImgAttributes {
   onError?: (event: SyntheticEvent<HTMLImageElement>) => void;
 }
 
-export type Props = LazyImageProps;

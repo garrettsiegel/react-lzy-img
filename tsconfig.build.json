@@ -19,6 +19,6 @@
     "isolatedModules": false,
     "stripInternal": true
   },
-  "include": ["src/index.ts"],
-  "exclude": ["node_modules", "dist", "**/*.test.*", "**/*.spec.*"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "**/*.test.*", "**/*.spec.*", "src/dev/**/*"]
 }

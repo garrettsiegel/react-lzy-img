@@ -1,11 +1,90 @@
-Audit Findings
+🔍 Final Comprehensive Audit Report for react-lzy-img
+After removing the dev testing features, here's the complete audit findings:
 
-High – Cross-platform build scripts (package.json): the build, cleanup-types, and fix-index-types pipeline shells out to rm -rf and find, which fail on Windows or GitHub Actions Windows runners. Replace with portable tools (rimraf, fast-glob, or Node’s fs APIs) so npm publish remains reliable across environments.
-High – Hand-written declaration bundle drift (bundle-types.js, index.d.ts): the generated d.ts file is a static template unrelated to the source types, so any prop change (e.g., adding placeholderBlur to LazyImage) won’t be reflected. Prefer emitting declarations directly from tsc or use rollup-plugin-dts/API Extractor so the published types always match the actual API.
-Medium – forceVisible/priority state is only read once (LazyImage.tsx lines 18-34): if forceVisible or priority toggles after the first render, isInView never updates because the state is initialised from props and never re-synced. Add an effect that watches those props and updates isInView so imperative consumers can force-load images later.
-Medium – LazyImage props don’t extend native <img> attributes (types.ts): unlike LazyPicture, the Props type omits React.ImgHTMLAttributes, preventing legitimate props (decoding, loading, ref, custom aria-*) from type-checking, and the implementation never spreads unknown props to <img>. Consider mirroring LazyPictureProps (extend & omit conflicting keys) and forward the rest to the underlying <img>.
-Medium – Fallback styles never ship (injectStyle.ts, LazyImage.css): the runtime CSS injection excludes .LazyImage-fallback, yet LazyImage.css defining it is never imported, so published builds render raw text for fallbacks. Either import the CSS beside the components or add those rules to the injected string.
-Low – Duplicate lazy-loading logic (LazyImage.tsx, LazyPicture.tsx, useLazyLoad.ts): both components roll their own IntersectionObserver setup instead of reusing useLazyLoad, which makes behaviours diverge (once, cleanup, SSR fallback). Refactoring to the shared hook would reduce code size and bugs.
-Low – useLazyImage timer edge cases (useLazyLoad.ts): the effect ignores placeholderSrc in its dependency list and never clears the timeout, so changing placeholders at runtime or unmounting before the timer fires can lead to stale state or set-state-on-unmounted warnings. Track all inputs and clear timers in the cleanup.
-Process – Tooling/testing gaps: the build relies on npm:rolldown-vite@7.2.2, which is still experimental and may emit incompatible bundles; there are no tests or automated visual checks backing the public API claims (only npm run lint/build currently succeed). Consider pinning a stable Vite/Rollup release, adding lightweight component tests or Storybook stories, and verifying the gzipped size claims.
-Lint (npm run lint) and build (npm run build) complete successfully with the current codebase. Next steps I’d tackle: 1) make the build/type pipeline portable and source-of-truth driven, 2) fix the forceVisible/props reactivity and prop typing gaps, 3) ensure the shipped CSS matches the documented classes, and 4) add minimal tests/demos to keep regressions in check.
+✅ STRENGTHS
+Clean Structure: Dev files properly removed, production-ready
+TypeScript: Complete type definitions now properly exported
+Linting: Zero ESLint errors, follows React best practices
+Build Process: Works correctly, proper dual-format output (ES/CJS)
+Bundle Size: Reasonable at ~10KB ES / ~7KB CJS
+🔴 CRITICAL Issues (Must Fix)
+1. Single Letter Variable Names in Bundle
+Issue: Built code contains variables like c, E, O, D, a, r, t, l
+Impact: Violates your "no single letter names" requirement, makes debugging impossible
+Source: Vite's minification process
+Fix Required: Configure Vite to preserve meaningful variable names
+2. Unused DevDependencies
+Issue: Several devDependencies not needed for NPM package:
+babel-plugin-react-compiler - Not used in build
+eslint-plugin-react-refresh - Only for dev server
+@types/react-dom - Not directly used
+globals - Redundant with ESLint config
+Impact: Larger development footprint, confusion for contributors
+Fix Required: Remove unused dependencies
+3. Dev Script References
+Issue: package.json still has dev and preview scripts referencing non-existent dev setup
+Impact: Scripts will fail, confusing for users trying to contribute
+Fix Required: Remove or update dev-related scripts
+🟠 HIGH Issues (Should Fix)
+4. Code Duplication Between Components
+Issue: Both LazyImage and LazyPicture duplicate blurhash rendering logic
+Lines: 47-65 in both files are nearly identical
+Impact: Maintenance burden, larger bundle size
+Fix: Extract shared blurhash rendering logic
+5. Complex Component Functions
+Issue: LazyImage (120+ lines) and LazyPicture (140+ lines) are too complex for junior developers
+Impact: Hard to understand, maintain, and debug
+Fix: Break into smaller, focused functions
+6. Unused Type Export
+Issue: export type Props = LazyImageProps; in types.ts is unused
+Impact: Confusing API surface
+Fix: Remove unused export
+🟡 MEDIUM Issues (Consider Fixing)
+7. Inconsistent Class Naming
+Issue: LazyPicture uses LazyPicture-wrapper but CSS classes are LazyImage-*
+Impact: Potential styling conflicts, confusing for users
+Fix: Use consistent naming convention
+8. Bundle Optimization Opportunities
+Issue: Blurhash decoder always included even if not used
+Impact: Unnecessary bytes for users not using blurhash
+Fix: Make blurhash import conditional/lazy
+9. Hardcoded Magic Numbers
+Issue: Canvas size 32, fade duration 300ms, etc.
+Impact: Not configurable, magic numbers reduce code clarity
+Fix: Extract as named constants
+🟢 LOW Issues (Nice to Have)
+10. Missing JSDoc Comments
+Issue: Public APIs lack documentation
+Impact: Poor developer experience
+Fix: Add JSDoc to exported functions/components
+11. No Error Boundaries
+Issue: Blurhash decode errors are silently caught
+Impact: Hard to debug issues
+Fix: Add proper error handling/logging
+📊 Updated Quality Metrics
+✅ Linting: 0 errors
+❌ Variable Naming: Single letters in output
+✅ Type Safety: Complete declarations
+⚠️ Bundle Size: Could be optimized
+❌ Code Complexity: Too complex for junior developers
+✅ Build Process: Works correctly
+🛠 Priority Action Plan
+Immediate (Critical)
+Configure Vite to preserve variable names for debugging
+Remove unused devDependencies
+Clean up package.json scripts
+Short Term (High)
+Extract shared blurhash logic
+Simplify component structure
+Remove unused type exports
+Long Term (Medium/Low)
+Standardize CSS class naming
+Add JSDoc documentation
+Optimize bundle with conditional imports
+📈 Updated Package Health Score: 7.5/10
+The package is functionally excellent but needs fixes for:
+
+Developer Experience (single letter vars, complex code)
+Maintainability (code duplication, unused deps)
+Production Readiness (proper variable names for debugging)
+Focus on the critical issues first - they directly impact your stated requirements for junior developer accessibility and debugging capability.

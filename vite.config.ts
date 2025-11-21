@@ -29,9 +29,13 @@ export default defineConfig({
           'react-dom': 'ReactDOM',
           'react/jsx-runtime': 'React',
         },
+        // Preserve meaningful variable names for better debugging
+        minifyInternalExports: false,
       },
     },
     outDir: 'dist',
     emptyOutDir: false, // Don't clear dist folder to preserve TypeScript declarations
+    // Disable minification to preserve meaningful variable names
+    minify: false,
   },
 });

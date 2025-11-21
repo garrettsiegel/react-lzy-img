@@ -1,8 +1,9 @@
-import { useRef, useState, useEffect } from 'react';
+import { useState } from 'react';
 import type { SyntheticEvent } from 'react';
-import { decode } from 'blurhash';
 import './injectStyle';
 import { useLazyLoad } from './useLazyLoad';
+import { BlurhashCanvas, PlaceholderImage } from './PlaceholderComponents';
+import { DEFAULT_FADE_DURATION, DEFAULT_PRELOAD_MARGIN, CSS_CLASSES } from './constants';
 import type { LazyPictureProps as Props } from './types';
 
 export default function LazyPicture(props: Props) {
@@ -15,14 +16,14 @@ export default function LazyPicture(props: Props) {
     placeholderBlur = false,
     aspectRatio,
     fadeIn = true,
-    fadeInDuration = 300,
+    fadeInDuration = DEFAULT_FADE_DURATION,
     priority = false,
     forceVisible = false,
     className = '',
     width,
     height,
     style = {},
-    preloadMargin = '200px',
+    preloadMargin = DEFAULT_PRELOAD_MARGIN,
     fallback,
     blurhash,
     lqip,
@@ -31,38 +32,21 @@ export default function LazyPicture(props: Props) {
     loading: loadingProp,
     onLoad,
     onError,
-    ...imgProps
+    ...imageProps
   } = props;
 
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const [containerRef, observedInView] = useLazyLoad<HTMLDivElement>({
     preloadMargin,
   });
   const assetKey = [src, srcSet ?? '', sizes ?? ''].join('|');
   const [loadedKey, setLoadedKey] = useState<string | null>(null);
   const [erroredKey, setErroredKey] = useState<string | null>(null);
+  
   const isLoaded = loadedKey === assetKey;
   const hasError = erroredKey === assetKey;
   const shouldForceVisible = forceVisible || priority;
   const shouldShowImage = shouldForceVisible || observedInView || isLoaded;
   const imageLoading = loadingProp ?? (priority ? 'eager' : 'lazy');
-
-  // Draw blurhash placeholder
-  useEffect(() => {
-    if (!blurhash || !canvasRef.current || isLoaded) return;
-    try {
-      const canvasSize = 32;
-      const pixels = decode(blurhash, canvasSize, canvasSize);
-      const context = canvasRef.current.getContext('2d');
-      if (context) {
-        const imageData = context.createImageData(canvasSize, canvasSize);
-        imageData.data.set(pixels);
-        context.putImageData(imageData, 0, 0);
-      }
-    } catch {
-      // Blurhash decode failed, fallback to other placeholders
-    }
-  }, [blurhash, isLoaded]);
 
   const containerStyle = {
     width,
@@ -75,9 +59,9 @@ export default function LazyPicture(props: Props) {
     ? { opacity: loaded ? 1 : 0, transition: `opacity ${fadeInDuration}ms ease-in-out` }
     : { opacity: 1 });
 
-  const wrapperClass = `LazyPicture-wrapper${className ? ' ' + className : ''}`;
-  const placeholderClass = `LazyImage-placeholder stack-item${fadeIn ? ' LazyImage-fade' : ''}`;
-  const imageClass = `LazyImage-img stack-item${fadeIn ? ' LazyImage-fade' : ''}`;
+  const wrapperClass = `${CSS_CLASSES.WRAPPER}${className ? ' ' + className : ''}`;
+  const placeholderClass = `${CSS_CLASSES.PLACEHOLDER} ${CSS_CLASSES.STACK_ITEM}${fadeIn ? ` ${CSS_CLASSES.FADE}` : ''}`;
+  const imageClass = `${CSS_CLASSES.IMAGE} ${CSS_CLASSES.STACK_ITEM}${fadeIn ? ` ${CSS_CLASSES.FADE}` : ''}`;
 
   const handleLoad = (event: SyntheticEvent<HTMLImageElement>) => {
     setLoadedKey(assetKey);
@@ -93,13 +77,11 @@ export default function LazyPicture(props: Props) {
   const renderPlaceholder = () => {
     if (blurhash && !isLoaded) {
       return (
-        <canvas
-          ref={canvasRef}
-          width={32}
-          height={32}
-          aria-hidden="true"
+        <BlurhashCanvas
+          blurhash={blurhash}
+          isLoaded={isLoaded}
           className={placeholderClass}
-          style={{ ...fadeStyle(false), width: '100%', height: '100%', display: 'block' }}
+          fadeStyle={fadeStyle(false)}
         />
       );
     }
@@ -107,12 +89,10 @@ export default function LazyPicture(props: Props) {
     const shouldShowPlaceholder = !blurhash && !isLoaded && (lqip || (placeholderBlur && placeholder));
     if (shouldShowPlaceholder) {
       return (
-        <img
-          src={lqip || placeholder}
-          alt=""
-          aria-hidden="true"
+        <PlaceholderImage
+          src={lqip || placeholder!}
           className={placeholderClass}
-          style={fadeStyle(false)}
+          fadeStyle={fadeStyle(false)}
         />
       );
     }
@@ -123,16 +103,16 @@ export default function LazyPicture(props: Props) {
   const renderFallback = () => {
     if (!hasError) return null;
     if (typeof fallback === 'string') {
-      return <div className="LazyImage-fallback">{fallback}</div>;
+      return <div className={CSS_CLASSES.FALLBACK}>{fallback}</div>;
     }
-    return fallback || <div className="LazyImage-fallback">Image failed to load.</div>;
+    return fallback || <div className={CSS_CLASSES.FALLBACK}>Image failed to load.</div>;
   };
 
   const renderPicture = () => shouldShowImage && (
-    <picture className="stack-item" style={{ width: '100%', height: '100%' }}>
+    <picture className={CSS_CLASSES.STACK_ITEM} style={{ width: '100%', height: '100%' }}>
       {srcSet && <source srcSet={srcSet} sizes={sizes} />}
       <img
-        {...imgProps}
+        {...imageProps}
         src={src}
         alt={alt}
         srcSet={srcSet}
@@ -150,7 +130,7 @@ export default function LazyPicture(props: Props) {
 
   return (
     <div ref={containerRef} className={wrapperClass} style={containerStyle}>
-      <div className="grid-stack">
+      <div className={CSS_CLASSES.GRID_STACK}>
         {renderFallback() || (
           <>
             {renderPlaceholder()}
