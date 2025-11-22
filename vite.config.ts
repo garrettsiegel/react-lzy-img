@@ -3,7 +3,12 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react({
+      jsxRuntime: 'classic',
+      jsxImportSource: undefined,
+    })
+  ],
   build: {
     lib: {
       entry: path.resolve(__dirname, 'src/index.ts'),
@@ -13,19 +18,21 @@ export default defineConfig({
     },
     rollupOptions: {
       external: (id) => {
-        return id === 'react' || id === 'react-dom' || id.startsWith('react/');
+        return id === 'react' || 
+               id === 'react-dom' || 
+               id === 'blurhash' ||
+               id.startsWith('react/');
       },
       output: {
         globals: {
           react: 'React',
           'react-dom': 'ReactDOM',
-          'react/jsx-runtime': 'React',
+          blurhash: 'blurhash',
         },
-        // Preserve meaningful variable names for better debugging
-        minifyInternalExports: false,
       },
     },
     outDir: 'dist',
-    minify: 'esbuild', // Enable minification for smaller bundle size
+    minify: 'esbuild',
+    cssCodeSplit: false,
   },
 });

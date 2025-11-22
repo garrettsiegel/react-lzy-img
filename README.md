@@ -1,6 +1,6 @@
 # react-lzy-img
 
-Lightweight React lazy loading library with responsive images, blurhash placeholders, and TypeScript support. **Under 3KB gzipped**.
+Lightweight React lazy loading library with responsive images, blurhash placeholders, and TypeScript support. **Under 1.5KB gzipped**.
 
 ## Features
 
@@ -9,7 +9,7 @@ Lightweight React lazy loading library with responsive images, blurhash placehol
 - **Smart Placeholders** - Blurhash, LQIP, or standard image placeholders  
 - **React & Preact** - Works with both React and Preact
 - **Single Component** - Unified LazyImage handles all use cases
-- **Lightweight** - Under 3KB gzipped, single dependency
+- **Lightweight** - Under 1.5KB gzipped, single dependency
 - **TypeScript** - Complete type definitions and IntelliSense
 - **Accessible** - Built-in ARIA support and screen reader friendly
 
@@ -19,7 +19,7 @@ Lightweight React lazy loading library with responsive images, blurhash placehol
 npm install react-lzy-img
 ```
 
-**Bundle Size:** Under 3KB gzipped • Tree-shakeable • Single dependency
+**Bundle Size:** 1.18KB gzipped (ES) / 0.99KB gzipped (CJS) + 0.30KB CSS • Tree-shakeable • Single dependency
 
 ## Quick Start
 
@@ -76,27 +76,18 @@ import { LazyImage } from 'react-lzy-img';
 | `fadeInDuration` | `number` | `300` | Fade duration (ms) |
 | `priority` | `boolean` | `false` | Eager loading |
 | `preloadMargin` | `string` | `'200px'` | Observer margin |
-| `fallback` | `ReactNode \| string` | - | Error state |
+| `fallback` | `ReactNode \| string` | - | Error state content |
+| `className` | `string` | - | CSS class for wrapper |
+| `width` | `number \| string` | - | Image width |
+| `height` | `number \| string` | - | Image height |
 | `aspectRatio` | `number` | - | CSS aspect-ratio |
+| `style` | `CSSProperties` | - | Inline styles for wrapper |
+| `loading` | `'lazy' \| 'eager'` | `'lazy'` | Native loading attribute |
+| `onLoad` | `function` | - | Image load event handler |
+| `onError` | `function` | - | Image error event handler |
 | `...props` | `ImgHTMLAttributes` | - | Standard `<img>` attributes |
 
-### useLazyLoad Hook
 
-For custom lazy loading scenarios:
-
-```tsx
-import { useLazyLoad } from 'react-lzy-img';
-
-function CustomComponent() {
-  const [ref, isInView] = useLazyLoad({ preloadMargin: '100px' });
-  
-  return (
-    <div ref={ref}>
-      {isInView ? <ExpensiveComponent /> : <PlaceholderComponent />}
-    </div>
-  );
-}
-```
 
 ## Examples
 
@@ -121,7 +112,6 @@ function CustomComponent() {
 <LazyImage
   src="/logo.png"
   alt="Company logo"
-  ariaLabel="Detailed description"
   role="img"
 />
 ```
@@ -143,8 +133,8 @@ Override default CSS classes:
 
 **Available Classes:**
 - `.lazy-image-wrapper` - Container element
-- `.lazy-image-img` - Main image element  
-- `.lazy-image-placeholder` - Placeholder elements
+- `.lazy-image-item` - Main image and placeholder elements
+- `.lazy-image-placeholder` - Placeholder elements (adds blur filter)
 - `.lazy-image-fallback` - Error state display
 
 ## Framework Support
@@ -165,7 +155,7 @@ import { LazyImage } from 'react-lzy-img';
 Fully typed with IntelliSense support:
 
 ```tsx
-import type { LazyImageProps, UseLazyLoadOptions } from 'react-lzy-img';
+import type { LazyImageProps } from 'react-lzy-img';
 
 const props: LazyImageProps = {
   src: '/image.jpg',
