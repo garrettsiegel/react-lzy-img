@@ -3,12 +3,9 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 
 export default defineConfig({
-  plugins: [
-    react({
-      jsxRuntime: 'classic',
-      jsxImportSource: undefined,
-    })
-  ],
+  plugins: [react({ 
+    jsxRuntime: 'classic'
+  })],
   build: {
     lib: {
       entry: path.resolve(__dirname, 'src/index.ts'),
@@ -17,12 +14,7 @@ export default defineConfig({
       formats: ['es', 'cjs'],
     },
     rollupOptions: {
-      external: (id) => {
-        return id === 'react' || 
-               id === 'react-dom' || 
-               id === 'blurhash' ||
-               id.startsWith('react/');
-      },
+      external: ['react', 'react-dom', 'blurhash'],
       output: {
         globals: {
           react: 'React',
@@ -31,8 +23,6 @@ export default defineConfig({
         },
       },
     },
-    outDir: 'dist',
-    minify: 'esbuild',
-    cssCodeSplit: false,
+    minify: true,
   },
 });

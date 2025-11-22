@@ -1,8 +1,6 @@
-import * as React from 'react';
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import type { ImgHTMLAttributes, CSSProperties, SyntheticEvent, ReactNode } from 'react';
 import { decode } from 'blurhash';
-import './lazy-image.css';
 
 export interface LazyImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, 
   'src' | 'alt' | 'className' | 'style' | 'width' | 'height' | 'loading' | 'onLoad' | 'onError'> {
@@ -28,17 +26,48 @@ export interface LazyImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>
   onError?: (event: SyntheticEvent<HTMLImageElement>) => void;
 }
 
-// Inline lazy loading hook
+// Inline styles to eliminate external CSS dependency
+const styles = {
+  wrapper: {
+    display: 'grid',
+    gridTemplateAreas: '"stack"',
+    placeItems: 'center',
+  } as CSSProperties,
+  item: {
+    gridArea: 'stack',
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover' as const,
+  },
+  placeholder: {
+    filter: 'blur(1rem)',
+    pointerEvents: 'none' as const,
+  },
+  fallback: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    background: '#f8f9fa',
+    border: '1px solid #dee2e6',
+    borderRadius: '4px',
+    color: '#6c757d',
+    fontSize: '0.875rem',
+    minHeight: '40px',
+    padding: '8px 12px',
+    textAlign: 'center' as const,
+  },
+};
+
+// Simplified lazy loading hook
 function useLazyLoad(preloadMargin = '200px') {
   const ref = useRef<HTMLDivElement>(null);
-  const [isInView, setIsInView] = useState(false);
+  const [isInView, setIsInView] = useState(() => 
+    typeof window === 'undefined' || !('IntersectionObserver' in window)
+  );
 
   useEffect(() => {
     const element = ref.current;
-    if (!element || typeof window === 'undefined' || !('IntersectionObserver' in window)) {
-      setIsInView(true);
-      return;
-    }
+    if (!element || isInView) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -52,13 +81,14 @@ function useLazyLoad(preloadMargin = '200px') {
 
     observer.observe(element);
     return () => observer.disconnect();
-  }, [preloadMargin]);
+  }, [preloadMargin, isInView]);
 
   return [ref, isInView] as const;
 }
 
 /**
  * LazyImage - Lightweight React component for lazy loading images
+ * Supports responsive images, placeholder images, and fade transitions
  */
 export default function LazyImage({
   src,
@@ -70,7 +100,7 @@ export default function LazyImage({
   lqip,
   fadeIn = true,
   fadeInDuration = 300,
-  className,
+  className = '',
   width,
   height,
   aspectRatio,
@@ -88,7 +118,7 @@ export default function LazyImage({
   const [hasError, setHasError] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  // Blurhash canvas effect
+  // Generate blurhash canvas when component mounts
   useEffect(() => {
     if (!blurhash || !canvasRef.current || isLoaded) return;
     
@@ -101,23 +131,39 @@ export default function LazyImage({
         ctx.putImageData(imageData, 0, 0);
       }
     } catch {
-      // Ignore decode errors
+      // Silently fail if blurhash is invalid
     }
   }, [blurhash, isLoaded]);
 
-  const shouldShow = priority || isInView;
-  const fadeStyle = fadeIn ? { 
-    opacity: isLoaded ? 1 : 0, 
-    transition: `opacity ${fadeInDuration}ms ease-in-out` 
-  } : {};
-
+  // Determine when to load the actual image
+  const shouldLoadImage = priority || isInView;
+  
+  // Container styles with dimensions and aspect ratio
   const containerStyle: CSSProperties = {
+    ...styles.wrapper,
     width,
     height,
     ...(aspectRatio && { aspectRatio: String(aspectRatio) }),
     ...style,
   };
 
+  // Image transition styles
+  const imageStyle = {
+    ...styles.item,
+    ...(fadeIn && { 
+      opacity: isLoaded ? 1 : 0, 
+      transition: `opacity ${fadeInDuration}ms ease-in-out` 
+    }),
+  };
+
+  // Placeholder styles
+  const placeholderStyle = {
+    ...styles.item,
+    ...styles.placeholder,
+    opacity: fadeIn ? 0.8 : 1,
+  };
+
+  // Event handlers
   const handleLoad = (event: SyntheticEvent<HTMLImageElement>) => {
     setIsLoaded(true);
     setHasError(false);
@@ -129,60 +175,43 @@ export default function LazyImage({
     onError?.(event);
   };
 
-  // Error fallback
+  // Error state
   if (hasError) {
-    const errorContent = typeof fallback === 'string' 
-      ? fallback 
-      : fallback || 'Image failed to load';
-    
     return (
-      <div 
-        ref={containerRef}
-        className={`lazy-image-wrapper ${className || ''}`}
-        style={containerStyle}
-      >
-        <div className="lazy-image-item lazy-image-fallback">
-          {errorContent}
+      <div ref={containerRef} className={className} style={containerStyle}>
+        <div style={styles.fallback}>
+          {fallback || 'Image failed to load'}
         </div>
       </div>
     );
   }
 
   return (
-    <div 
-      ref={containerRef}
-      className={`lazy-image-wrapper ${className || ''}`}
-      style={containerStyle}
-    >
-      {/* Placeholder */}
+    <div ref={containerRef} className={className} style={containerStyle}>
+      {/* Placeholder - blurhash canvas, lqip, or regular image */}
       {!isLoaded && (
-        <>
-          {blurhash && (
-            <canvas
-              ref={canvasRef}
-              width={32}
-              height={32}
-              aria-hidden="true"
-              className="lazy-image-item lazy-image-placeholder"
-              style={{ opacity: fadeIn ? 0.8 : 1 }}
-            />
-          )}
-          {!blurhash && (lqip || placeholder) && (
-            <img
-              src={lqip || placeholder}
-              alt=""
-              aria-hidden="true"
-              className="lazy-image-item lazy-image-placeholder"
-              style={{ opacity: fadeIn ? 0.8 : 1 }}
-            />
-          )}
-        </>
+        blurhash ? (
+          <canvas
+            ref={canvasRef}
+            width={32}
+            height={32}
+            aria-hidden="true"
+            style={placeholderStyle}
+          />
+        ) : (lqip || placeholder) ? (
+          <img
+            src={lqip || placeholder}
+            alt=""
+            aria-hidden="true"
+            style={placeholderStyle}
+          />
+        ) : null
       )}
-
+      
       {/* Main image */}
-      {shouldShow && (
+      {shouldLoadImage && (
         srcSet ? (
-          <picture className="lazy-image-item">
+          <picture style={styles.item}>
             <source srcSet={srcSet} sizes={sizes} />
             <img
               {...imageProps}
@@ -191,8 +220,7 @@ export default function LazyImage({
               loading={loading || (priority ? 'eager' : 'lazy')}
               onLoad={handleLoad}
               onError={handleError}
-              className="lazy-image-item"
-              style={fadeStyle}
+              style={imageStyle}
             />
           </picture>
         ) : (
@@ -203,8 +231,7 @@ export default function LazyImage({
             loading={loading || (priority ? 'eager' : 'lazy')}
             onLoad={handleLoad}
             onError={handleError}
-            className="lazy-image-item"
-            style={fadeStyle}
+            style={imageStyle}
           />
         )
       )}

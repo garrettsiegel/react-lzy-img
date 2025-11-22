@@ -1,8 +1,8 @@
 {
   "name": "react-lzy-img",
-  "version": "0.1.22",
+  "version": "0.2.0",
   "type": "module",
-  "description": "Lightweight (< 3KB) React lazy loading library with responsive images, blurhash placeholders, and TypeScript support. Simple, fast, and feature-complete.",
+  "description": "Lightweight (~1.4KB gzipped) React lazy loading library with responsive images, blurhash placeholders, and TypeScript support. Simple, fast, and feature-complete.",
   "main": "dist/index.cjs.js",
   "module": "dist/index.es.js",
   "types": "dist/index.d.ts",
@@ -46,10 +46,11 @@
     "modern-images"
   ],
   "scripts": {
-    "build": "rm -rf dist && vite build && tsc --declaration --emitDeclarationOnly --outDir dist --rootDir src --moduleResolution node --noEmit false --skipLibCheck",
+    "build": "rm -rf dist && vite build && tsc",
     "prepublishOnly": "npm run build",
     "lint": "eslint ."
   },
+
   "dependencies": {
     "blurhash": "^2.0.5"
   },

@@ -1,6 +1,6 @@
 # react-lzy-img
 
-Lightweight React lazy loading library with responsive images, blurhash placeholders, and TypeScript support. **Under 1.5KB gzipped**.
+Lightweight React lazy loading library with responsive images, blurhash placeholders, and TypeScript support. **Under 2KB gzipped**.
 
 ## Features
 
@@ -9,7 +9,7 @@ Lightweight React lazy loading library with responsive images, blurhash placehol
 - **Smart Placeholders** - Blurhash, LQIP, or standard image placeholders  
 - **React & Preact** - Works with both React and Preact
 - **Single Component** - Unified LazyImage handles all use cases
-- **Lightweight** - Under 1.5KB gzipped, single dependency
+- **Lightweight** - Under 2KB gzipped, minimal dependencies
 - **TypeScript** - Complete type definitions and IntelliSense
 - **Accessible** - Built-in ARIA support and screen reader friendly
 
@@ -19,7 +19,7 @@ Lightweight React lazy loading library with responsive images, blurhash placehol
 npm install react-lzy-img
 ```
 
-**Bundle Size:** 1.18KB gzipped (ES) / 0.99KB gzipped (CJS) + 0.30KB CSS • Tree-shakeable • Single dependency
+**Bundle Size:** ~1.4KB gzipped • Tree-shakeable • Single dependency (blurhash)
 
 ## Quick Start
 
@@ -118,24 +118,16 @@ import { LazyImage } from 'react-lzy-img';
 
 ## Styling
 
-Override default CSS classes:
+The component uses inline styles for minimal footprint. You can customize styling via the `className` and `style` props:
 
-```css
-.lazy-image-wrapper {
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.lazy-image-placeholder {
-  filter: blur(10px);
-}
+```tsx
+<LazyImage
+  src="/image.jpg"
+  alt="Styled image"
+  className="my-image"
+  style={{ borderRadius: '8px', overflow: 'hidden' }}
+/>
 ```
-
-**Available Classes:**
-- `.lazy-image-wrapper` - Container element
-- `.lazy-image-item` - Main image and placeholder elements
-- `.lazy-image-placeholder` - Placeholder elements (adds blur filter)
-- `.lazy-image-fallback` - Error state display
 
 ## Framework Support
 
@@ -144,11 +136,23 @@ Override default CSS classes:
 import { LazyImage } from 'react-lzy-img';
 ```
 
-**Preact** - Also fully compatible
+**Preact** - Fully compatible with simple setup
 ```tsx
 import { LazyImage } from 'react-lzy-img';
-// Works out of the box with Preact!
+// Works seamlessly with Preact!
 ```
+
+> **Preact Setup**: Add to your `vite.config.js`:
+> ```js
+> export default {
+>   resolve: {
+>     alias: {
+>       "react": "preact/compat",
+>       "react-dom": "preact/compat"
+>     }
+>   }
+> }
+> ```
 
 ## TypeScript
 
