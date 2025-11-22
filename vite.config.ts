@@ -3,15 +3,7 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 
 export default defineConfig({
-  plugins: [
-    react(),
-    {
-      name: 'typescript-declarations',
-      buildEnd() {
-        // TypeScript declarations are handled by the separate tsc command
-      }
-    }
-  ],
+  plugins: [react()],
   build: {
     lib: {
       entry: path.resolve(__dirname, 'src/index.ts'),
@@ -34,8 +26,6 @@ export default defineConfig({
       },
     },
     outDir: 'dist',
-    emptyOutDir: false, // Don't clear dist folder to preserve TypeScript declarations
-    // Disable minification to preserve meaningful variable names
-    minify: false,
+    minify: 'esbuild', // Enable minification for smaller bundle size
   },
 });
