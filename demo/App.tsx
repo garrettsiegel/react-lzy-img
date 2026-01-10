@@ -1,5 +1,3 @@
-import { useState } from 'react';
-import LazyImage from '../src/LazyImage';
 import Hero from './components/Hero';
 import Features from './components/Features';
 import Examples from './components/Examples';
