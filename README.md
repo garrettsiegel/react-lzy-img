@@ -12,11 +12,6 @@ Lightweight React lazy loading library with responsive images, blurhash placehol
 
 **[View full documentation and live examples →](https://www.reactlzyimg.online)**
 
-To run the documentation site locally:
-```bash
-npm run dev
-```
-
 ## Features
 
 - **Lazy Loading** - Intersection Observer with `loading="lazy"` fallback
