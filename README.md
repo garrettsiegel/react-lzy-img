@@ -12,10 +12,10 @@ Lightweight React lazy loading library with responsive images, blurhash placehol
 
 - **Lazy Loading** - Intersection Observer with `loading="lazy"` fallback
 - **Responsive Images** - Automatic `<picture>` element with srcSet/sizes
-- **Smart Placeholders** - Blurhash, LQIP, or standard image placeholders  
+- **Smart Placeholders** - Blurhash, LQIP, or standard image placeholders
 - **React & Preact** - Works with both React and Preact
 - **Single Component** - Unified LazyImage handles all use cases
-- **Lightweight** - Under 2KB gzipped, minimal dependencies
+- **Lightweight** - ~1.4KB gzipped, minimal dependencies
 - **TypeScript** - Complete type definitions and IntelliSense
 - **Accessible** - Built-in ARIA support and screen reader friendly
 
