@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import type { ImgHTMLAttributes, CSSProperties, SyntheticEvent, ReactNode } from 'react';
 import { decode } from 'blurhash';
 
