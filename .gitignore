@@ -9,6 +9,7 @@ lerna-debug.log*
 
 node_modules
 dist
+dist-demo
 dist-ssr
 *.local
 
@@ -32,3 +33,4 @@ dist-ssr
 # Coverage
 coverage
 ./github/copilot-instructions.md
+.vercel

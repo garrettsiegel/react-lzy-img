@@ -17,7 +17,7 @@
     "type": "git",
     "url": "https://github.com/garrettsiegel/react-lzy-img.git"
   },
-  "homepage": "https://github.com/garrettsiegel/react-lzy-img#readme",
+  "homepage": "https://www.reactlzyimg.online",
   "bugs": {
     "url": "https://github.com/garrettsiegel/react-lzy-img/issues"
   },
@@ -56,7 +56,9 @@
     "modern-images"
   ],
   "scripts": {
-    "build": "rimraf dist && vite build",
+    "dev": "vite",
+    "build": "BUILD_MODE=library rimraf dist && vite build",
+    "build:demo": "vite build",
     "prepublishOnly": "npm run build",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
@@ -65,11 +67,12 @@
     "test:coverage": "vitest --coverage"
   },
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
     "blurhash": "^2.0.5"
   },
   "peerDependencies": {
-    "react": ">=17.0.0",
-    "react-dom": ">=17.0.0"
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
@@ -80,12 +83,16 @@
     "@types/react": "^19.2.2",
     "@vitejs/plugin-react": "^5.1.0",
     "@vitest/coverage-v8": "^4.0.16",
+    "autoprefixer": "^10.4.23",
+    "daisyui": "^5.5.14",
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
     "globals": "^16.5.0",
     "happy-dom": "^20.1.0",
     "jsdom": "^27.4.0",
+    "postcss": "^8.5.6",
     "rimraf": "^6.1.2",
+    "tailwindcss": "^3.4.19",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.46.3",
     "vite": "^7.2.4",

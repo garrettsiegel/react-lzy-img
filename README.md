@@ -8,6 +8,15 @@
 
 Lightweight React lazy loading library with responsive images, blurhash placeholders, and full TypeScript support. **~1.4KB gzipped**.
 
+## 📖 Documentation
+
+**[View full documentation and live examples →](https://www.reactlzyimg.online)**
+
+To run the documentation site locally:
+```bash
+npm run dev
+```
+
 ## Features
 
 - **Lazy Loading** - Intersection Observer with `loading="lazy"` fallback
