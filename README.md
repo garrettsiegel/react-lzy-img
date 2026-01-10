@@ -29,6 +29,40 @@ Lightweight React lazy loading library with responsive images, blurhash placehol
 npm install react-lzy-img
 ```
 
+### Using with Preact
+
+react-lzy-img works seamlessly with Preact! Just install and configure preact/compat aliasing:
+
+```bash
+npm install react-lzy-img preact
+```
+
+**Vite:**
+```javascript
+// vite.config.js
+export default {
+  resolve: {
+    alias: {
+      'react': 'preact/compat',
+      'react-dom': 'preact/compat'
+    }
+  }
+}
+```
+
+**Webpack:**
+```javascript
+// webpack.config.js
+module.exports = {
+  resolve: {
+    alias: {
+      'react': 'preact/compat',
+      'react-dom': 'preact/compat'
+    }
+  }
+}
+```
+
 **Bundle Size:** ~1.4KB gzipped • Tree-shakeable • Single dependency (blurhash)
 
 ## Quick Start

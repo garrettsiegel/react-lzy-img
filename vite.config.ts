@@ -29,11 +29,13 @@ export default defineConfig(({ mode }) => {
             formats: ['es', 'cjs'],
           },
           rollupOptions: {
-            external: ['react', 'react-dom', 'blurhash'],
+            external: ['react', 'react-dom', 'preact', 'preact/hooks', 'blurhash'],
             output: {
               globals: {
                 react: 'React',
                 'react-dom': 'ReactDOM',
+                preact: 'preact',
+                'preact/hooks': 'preactHooks',
                 blurhash: 'blurhash',
               },
             },
