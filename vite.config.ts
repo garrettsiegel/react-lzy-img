@@ -3,10 +3,9 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 
 export default defineConfig({
-  plugins: [react({ 
-    jsxRuntime: 'classic'
-  })],
+  plugins: [react()],
   build: {
+    sourcemap: true,
     lib: {
       entry: path.resolve(__dirname, 'src/index.ts'),
       name: 'ReactLzyImg',

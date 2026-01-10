@@ -73,14 +73,15 @@ function useLazyLoad(preloadMargin = '200px') {
       ([entry]) => {
         if (entry.isIntersecting) {
           setIsInView(true);
-          observer.disconnect();
         }
       },
       { rootMargin: preloadMargin }
     );
 
     observer.observe(element);
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+    };
   }, [preloadMargin, isInView]);
 
   return [ref, isInView] as const;
@@ -120,7 +121,10 @@ export default function LazyImage({
 
   // Generate blurhash canvas when component mounts
   useEffect(() => {
-    if (!blurhash || !canvasRef.current || isLoaded) return;
+    if (!blurhash || !canvasRef.current) return;
+    
+    // Check if already loaded to prevent race condition
+    if (isLoaded) return;
     
     try {
       const pixels = decode(blurhash, 32, 32);
@@ -130,13 +134,29 @@ export default function LazyImage({
         imageData.data.set(pixels);
         ctx.putImageData(imageData, 0, 0);
       }
-    } catch {
-      // Silently fail if blurhash is invalid
+    } catch (error) {
+      // Warn about invalid blurhash
+      console.warn('[LazyImage] Failed to decode blurhash:', error);
     }
+
+    // Cleanup canvas on unmount
+    return () => {
+      if (canvasRef.current) {
+        const ctx = canvasRef.current.getContext('2d');
+        if (ctx) {
+          ctx.clearRect(0, 0, 32, 32);
+        }
+      }
+    };
   }, [blurhash, isLoaded]);
 
   // Determine when to load the actual image
   const shouldLoadImage = priority || isInView;
+  
+  // Respect prefers-reduced-motion
+  const prefersReducedMotion = typeof window !== 'undefined' && 
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const shouldAnimate = fadeIn && !prefersReducedMotion;
   
   // Container styles with dimensions and aspect ratio
   const containerStyle: CSSProperties = {
@@ -150,7 +170,7 @@ export default function LazyImage({
   // Image transition styles
   const imageStyle = {
     ...styles.item,
-    ...(fadeIn && { 
+    ...(shouldAnimate && { 
       opacity: isLoaded ? 1 : 0, 
       transition: `opacity ${fadeInDuration}ms ease-in-out` 
     }),

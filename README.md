@@ -1,6 +1,12 @@
 # react-lzy-img
 
-Lightweight React lazy loading library with responsive images, blurhash placeholders, and TypeScript support. **Under 2KB gzipped**.
+[![npm version](https://img.shields.io/npm/v/react-lzy-img.svg)](https://www.npmjs.com/package/react-lzy-img)
+[![npm downloads](https://img.shields.io/npm/dm/react-lzy-img.svg)](https://www.npmjs.com/package/react-lzy-img)
+[![Bundle Size](https://img.shields.io/bundlephobia/minzip/react-lzy-img)](https://bundlephobia.com/package/react-lzy-img)
+[![CI](https://github.com/garrettsiegel/react-lzy-img/workflows/CI/badge.svg)](https://github.com/garrettsiegel/react-lzy-img/actions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+Lightweight React lazy loading library with responsive images, blurhash placeholders, and TypeScript support. **~1.4KB gzipped**.
 
 ## Features
 
@@ -169,7 +175,121 @@ const props: LazyImageProps = {
 };
 ```
 
+## Generating Blurhash Strings
+
+To use blurhash placeholders, you need to generate blurhash strings from your images. You can do this server-side or during your build process:
+
+### Node.js Example
+
+```bash
+npm install sharp blurhash
+```
+
+```js
+const sharp = require('sharp');
+const { encode } = require('blurhash');
+
+async function generateBlurhash(imagePath) {
+  const { data, info } = await sharp(imagePath)
+    .raw()
+    .ensureAlpha()
+    .resize(32, 32, { fit: 'inside' })
+    .toBuffer({ resolveWithObject: true });
+
+  const blurhash = encode(
+    new Uint8ClampedArray(data),
+    info.width,
+    info.height,
+    4,
+    4
+  );
+
+  return blurhash;
+}
+
+// Usage
+const hash = await generateBlurhash('./image.jpg');
+console.log(hash); // "LEHV6nWB2yk8pyo0adR*.7kCMdnj"
+```
+
+### Online Tools
+
+- [Blurhash.io](https://blurha.sh/) - Upload images and get blurhash strings
+- [Blurhash Playground](https://github.com/woltapp/blurhash) - Official playground
+
+## Browser Compatibility
+
+| Feature | Chrome | Firefox | Safari | Edge |
+|---------|--------|---------|--------|------|
+| IntersectionObserver | 51+ | 55+ | 12.1+ | 15+ |
+| Native lazy loading | 77+ | 75+ | 15.4+ | 79+ |
+| Picture element | 38+ | 38+ | 9.1+ | 13+ |
+| Aspect ratio CSS | 88+ | 89+ | 15+ | 88+ |
+
+**Fallback behavior**: If IntersectionObserver is not supported, images load immediately. Native lazy loading (`loading="lazy"`) is used as a progressive enhancement.
+
+## Troubleshooting
+
+### Images not loading
+
+**Problem**: Images remain blank or don't load
+**Solutions**:
+- Verify the `src` path is correct and accessible
+- Check browser console for network errors
+- Ensure parent container has defined height/width
+- Try setting `priority={true}` to bypass lazy loading
+
+### Blurhash not rendering
+
+**Problem**: Canvas element shows but blurhash doesn't render
+**Solutions**:
+- Verify blurhash string is valid (test at [blurha.sh](https://blurha.sh/))
+- Check browser console for decode warnings
+- Ensure blurhash string is properly formatted (usually 20-30 characters)
+- Try a simpler blurhash with fewer components (4x4 instead of 9x9)
+
+### Layout shift issues
+
+**Problem**: Page jumps when images load
+**Solutions**:
+- Set explicit `width` and `height` props
+- Use `aspectRatio` prop to maintain proportions
+- Set container dimensions in parent CSS
+- Use `min-height` on containers
+
+### Fade animation not smooth
+
+**Problem**: Fade-in appears janky or doesn't work
+**Solutions**:
+- Ensure `fadeIn={true}` is set (default)
+- Adjust `fadeInDuration` (default 300ms)
+- Check for CSS conflicts with opacity/transition
+- User has `prefers-reduced-motion` enabled (animation disabled by design)
+
+### Performance issues
+
+**Problem**: Page feels slow with many images
+**Solutions**:
+- Reduce `preloadMargin` (default "200px")
+- Use smaller placeholder images or LQIP
+- Consider lower-resolution blurhash (16x16 instead of 32x32 canvas)
+- Use `priority={true}` only for above-fold images
+- Compress source images
+
+### TypeScript errors
+
+**Problem**: Type errors in your code
+**Solutions**:
+- Ensure `@types/react` is installed
+- Check your `tsconfig.json` has `"jsx": "react-jsx"`
+- Import types: `import type { LazyImageProps } from 'react-lzy-img'`
+- Clear TypeScript cache: `rm -rf node_modules/.cache`
+
 ---
+
+## Contributing
+
+Contributions welcome! Please read the [contributing guidelines](https://github.com/garrettsiegel/react-lzy-img/blob/main/CONTRIBUTING.md) before submitting PRs.
 
 ## License
 

@@ -1,6 +1,6 @@
 {
   "name": "react-lzy-img",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
   "description": "Lightweight (~1.4KB gzipped) React lazy loading library with responsive images, blurhash placeholders, and TypeScript support. Simple, fast, and feature-complete.",
   "main": "dist/index.cjs.js",
@@ -17,8 +17,18 @@
     "type": "git",
     "url": "https://github.com/garrettsiegel/react-lzy-img.git"
   },
+  "homepage": "https://github.com/garrettsiegel/react-lzy-img#readme",
+  "bugs": {
+    "url": "https://github.com/garrettsiegel/react-lzy-img/issues"
+  },
   "author": "Garrett Siegel <garrettsiegel@gmail.com>",
   "license": "MIT",
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "keywords": [
     "react",
     "react-component",
@@ -46,11 +56,14 @@
     "modern-images"
   ],
   "scripts": {
-    "build": "rm -rf dist && vite build && tsc",
+    "build": "rimraf dist && vite build && tsc",
     "prepublishOnly": "npm run build",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage"
   },
-
   "dependencies": {
     "blurhash": "^2.0.5"
   },
@@ -60,14 +73,21 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.1",
+    "@testing-library/user-event": "^14.6.1",
     "@types/node": "^24.10.0",
     "@types/react": "^19.2.2",
     "@vitejs/plugin-react": "^5.1.0",
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
     "globals": "^16.5.0",
+    "happy-dom": "^20.1.0",
+    "jsdom": "^27.4.0",
+    "rimraf": "^6.1.2",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.46.3",
-    "vite": "^7.2.4"
+    "vite": "^7.2.4",
+    "vitest": "^4.0.16"
   }
 }

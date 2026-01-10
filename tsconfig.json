@@ -14,11 +14,13 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": false,
-    "jsx": "react",
+    "jsx": "react-jsx",
     "declaration": true,
-    "declarationMap": false,
+    "declarationMap": true,
+    "incremental": true,
     "outDir": "./dist",
-    "rootDir": "./src"
+    "rootDir": "./src",
+    "types": ["vitest/globals", "@testing-library/jest-dom", "node"]
   },
   "include": ["src/**/*"],
   "exclude": ["dist", "node_modules"]
