@@ -106,7 +106,8 @@ export default {
   resolve: {
     alias: {
       'react': 'preact/compat',
-      'react-dom': 'preact/compat'
+      'react-dom': 'preact/compat',
+      'react/jsx-runtime': 'preact/jsx-runtime'
     }
   }
 }`}</code>
