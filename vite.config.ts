@@ -1,9 +1,16 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import dts from 'vite-plugin-dts';
 import path from 'path';
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    dts({
+      include: ['src/index.ts', 'src/LazyImage.tsx'],
+      exclude: ['src/**/*.test.tsx', 'src/**/*.test.ts', 'src/__tests__'],
+    }),
+  ],
   build: {
     sourcemap: true,
     lib: {
