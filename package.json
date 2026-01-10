@@ -1,6 +1,6 @@
 {
   "name": "react-lzy-img",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "type": "module",
   "description": "Lightweight (~1.4KB gzipped) React lazy loading library with responsive images, blurhash placeholders, and TypeScript support. Simple, fast, and feature-complete.",
   "main": "dist/index.cjs.js",
