@@ -57,8 +57,8 @@
   ],
   "scripts": {
     "dev": "vite",
-    "build": "BUILD_MODE=library rimraf dist && vite build",
-    "build:demo": "vite build",
+    "build": "rimraf dist && vite build --mode production",
+    "build:demo": "vite build --mode demo",
     "prepublishOnly": "npm run build",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",

@@ -3,10 +3,11 @@ import react from '@vitejs/plugin-react';
 import dts from 'vite-plugin-dts';
 import path from 'path';
 
-const isLibraryBuild = process.env.BUILD_MODE === 'library';
+export default defineConfig(({ mode }) => {
+  const isLibraryBuild = mode === 'production';
 
-export default defineConfig({
-  plugins: [
+  return {
+    plugins: [
     react(),
     ...(isLibraryBuild
       ? [
@@ -46,4 +47,5 @@ export default defineConfig({
           outDir: 'dist-demo',
         },
       }),
+  };
 });
