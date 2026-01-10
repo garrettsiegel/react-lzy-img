@@ -6,7 +6,7 @@
 [![CI](https://github.com/garrettsiegel/react-lzy-img/workflows/CI/badge.svg)](https://github.com/garrettsiegel/react-lzy-img/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Lightweight React lazy loading library with responsive images, blurhash placeholders, and TypeScript support. **~1.4KB gzipped**.
+Lightweight React lazy loading library with responsive images, blurhash placeholders, and full TypeScript support. **~1.4KB gzipped**.
 
 ## Features
 
