@@ -25,4 +25,10 @@ dist-ssr
 
 # Package files
 *.tgz
+
+# TypeScript
+*.tsbuildinfo
+
+# Coverage
+coverage
 ./github/copilot-instructions.md

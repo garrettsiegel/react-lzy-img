@@ -56,7 +56,7 @@
     "modern-images"
   ],
   "scripts": {
-    "build": "rimraf dist && vite build && tsc",
+    "build": "rimraf dist && vite build && tsc --project tsconfig.build.json",
     "prepublishOnly": "npm run build",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
