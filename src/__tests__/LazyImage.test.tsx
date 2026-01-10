@@ -9,7 +9,7 @@ class MockIntersectionObserver {
 
   constructor(callback: IntersectionObserverCallback) {
     this.callback = callback;
-    (global as any).mockObserver = this;
+    (global as Record<string, unknown>).mockObserver = this;
   }
 
   observe(element: Element) {
@@ -34,15 +34,13 @@ class MockIntersectionObserver {
       rootBounds: null,
       time: Date.now(),
     }));
-    this.callback(entries, this as any);
+    this.callback(entries, this as unknown as IntersectionObserver);
   }
 }
 
-let mockObserver: MockIntersectionObserver | null = null;
-
 beforeEach(() => {
   // Setup IntersectionObserver mock
-  global.IntersectionObserver = MockIntersectionObserver as any;
+  global.IntersectionObserver = MockIntersectionObserver as unknown as typeof IntersectionObserver;
 
   // Setup matchMedia mock for prefers-reduced-motion
   global.matchMedia = vi.fn().mockImplementation((query) => ({
@@ -68,7 +66,7 @@ describe('LazyImage', () => {
     const { container } = render(<LazyImage src="test.jpg" alt="Test image" />);
     
     // Trigger intersection
-    const mockObs = (global as any).mockObserver;
+    const mockObs = (global as Record<string, unknown>).mockObserver as MockIntersectionObserver | undefined;
     if (mockObs) {
       mockObs.trigger(true);
     }
@@ -233,7 +231,7 @@ describe('LazyImage', () => {
 
   it('respects prefers-reduced-motion', () => {
     // Mock prefers-reduced-motion
-    global.matchMedia = vi.fn().mockImplementation((query) => ({
+    global.matchMedia = vi.fn().mockImplementation((query: string) => ({
       matches: query === '(prefers-reduced-motion: reduce)',
       media: query,
       onchange: null,
@@ -292,7 +290,7 @@ describe('LazyImage', () => {
     const { container } = render(<LazyImage src="test.jpg" alt="Test image" priority={false} />);
     
     // Trigger intersection
-    const mockObs = (global as any).mockObserver;
+    const mockObs = (global as Record<string, unknown>).mockObserver as MockIntersectionObserver | undefined;
     if (mockObs) {
       mockObs.trigger(true);
     }

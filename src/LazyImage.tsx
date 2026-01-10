@@ -126,9 +126,11 @@ export default function LazyImage({
     // Check if already loaded to prevent race condition
     if (isLoaded) return;
     
+    const canvas = canvasRef.current;
+    
     try {
       const pixels = decode(blurhash, 32, 32);
-      const ctx = canvasRef.current.getContext('2d');
+      const ctx = canvas.getContext('2d');
       if (ctx) {
         const imageData = ctx.createImageData(32, 32);
         imageData.data.set(pixels);
@@ -141,11 +143,9 @@ export default function LazyImage({
 
     // Cleanup canvas on unmount
     return () => {
-      if (canvasRef.current) {
-        const ctx = canvasRef.current.getContext('2d');
-        if (ctx) {
-          ctx.clearRect(0, 0, 32, 32);
-        }
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.clearRect(0, 0, 32, 32);
       }
     };
   }, [blurhash, isLoaded]);
