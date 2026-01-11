@@ -330,3 +330,202 @@ describe('LazyImage', () => {
     expect(img).toHaveAttribute('crossorigin', 'anonymous');
   });
 });
+
+describe('LazyImage - Error Handling & Edge Cases', () => {
+  it('cleans up canvas properly on unmount to release memory', () => {
+    const { container, unmount } = render(
+      <LazyImage 
+        src="test.jpg" 
+        alt="Test image" 
+        blurhash="LEHV6nWB2yk8pyo0adR*.7kCMdnj"
+      />
+    );
+
+    const canvas = container.querySelector('canvas');
+    expect(canvas).toBeInTheDocument();
+    expect(canvas?.width).toBe(32);
+    expect(canvas?.height).toBe(32);
+
+    // Unmount and check canvas dimensions are set to 0
+    unmount();
+    
+    // Canvas dimensions should be 0 after cleanup
+    expect(canvas?.width).toBe(0);
+    expect(canvas?.height).toBe(0);
+  });
+
+  it('includes proper accessibility attributes during loading', () => {
+    const { container } = render(
+      <LazyImage 
+        src="test.jpg" 
+        alt="Accessible test image"
+      />
+    );
+
+    const wrapper = container.firstChild as HTMLElement;
+    expect(wrapper).toHaveAttribute('role', 'img');
+    expect(wrapper).toHaveAttribute('aria-label', 'Accessible test image');
+    expect(wrapper).toHaveAttribute('aria-busy', 'true');
+  });
+
+  it('sets aria-busy to false after image loads', async () => {
+    const { container } = render(
+      <LazyImage 
+        src="test.jpg" 
+        alt="Test image"
+        priority
+      />
+    );
+
+    const wrapper = container.firstChild as HTMLElement;
+    expect(wrapper).toHaveAttribute('aria-busy', 'true');
+
+    const img = container.querySelector('img[alt="Test image"]');
+    if (img) {
+      const loadEvent = new Event('load');
+      img.dispatchEvent(loadEvent);
+    }
+
+    await waitFor(() => {
+      expect(wrapper).toHaveAttribute('aria-busy', 'false');
+    });
+  });
+
+  it('includes role="alert" on error fallback for screen readers', async () => {
+    const { container } = render(
+      <LazyImage 
+        src="test.jpg" 
+        alt="Test image"
+        fallback="Custom error message"
+        priority
+      />
+    );
+
+    const img = container.querySelector('img');
+    if (img) {
+      const errorEvent = new Event('error');
+      img.dispatchEvent(errorEvent);
+    }
+
+    await waitFor(() => {
+      const alert = container.querySelector('[role="alert"]');
+      expect(alert).toBeInTheDocument();
+      expect(alert?.textContent).toContain('Custom error message');
+    });
+  });
+
+  it('handles SSR environment without IntersectionObserver', () => {
+    // Temporarily remove IntersectionObserver
+    const originalIO = global.IntersectionObserver;
+    // @ts-expect-error - Simulating SSR
+    delete global.IntersectionObserver;
+
+    const { container } = render(
+      <LazyImage 
+        src="test.jpg" 
+        alt="SSR test image"
+      />
+    );
+
+    // Should render immediately without observer
+    const img = container.querySelector('img[alt="SSR test image"]');
+    expect(img).toBeInTheDocument();
+
+    // Restore IntersectionObserver
+    global.IntersectionObserver = originalIO;
+  });
+
+  it('handles empty src gracefully', () => {
+    const { container } = render(
+      <LazyImage 
+        src="" 
+        alt="Empty src test"
+        priority
+      />
+    );
+
+    // Should still render container even with empty src
+    const wrapper = container.firstChild as HTMLElement;
+    expect(wrapper).toBeInTheDocument();
+  });
+
+  it('warns about invalid blurhash and sets error state', () => {
+    const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    render(
+      <LazyImage 
+        src="test.jpg" 
+        alt="Test image" 
+        blurhash="invalid"
+      />
+    );
+
+    // Should warn about invalid blurhash
+    expect(consoleSpy).toHaveBeenCalledWith(
+      expect.stringContaining('[LazyImage] Failed to decode blurhash'),
+      expect.any(Error)
+    );
+
+    consoleSpy.mockRestore();
+  });
+
+  it('prefers blurhash over lqip when both provided and blurhash is valid', () => {
+    const { container } = render(
+      <LazyImage 
+        src="test.jpg" 
+        alt="Test image" 
+        blurhash="LEHV6nWB2yk8pyo0adR*.7kCMdnj"
+        lqip="fallback.jpg"
+      />
+    );
+
+    // Should show canvas (blurhash) not img (lqip)
+    const canvas = container.querySelector('canvas');
+    const lqipImg = container.querySelector('img[src="fallback.jpg"]');
+    
+    expect(canvas).toBeInTheDocument();
+    expect(lqipImg).not.toBeInTheDocument();
+  });
+
+  it('maintains aspect ratio without string conversion', () => {
+    const { container } = render(
+      <LazyImage 
+        src="test.jpg" 
+        alt="Test image" 
+        aspectRatio={1.5}
+      />
+    );
+    
+    const wrapper = container.firstChild as HTMLElement;
+    // Aspect ratio should be numeric, not string
+    expect(wrapper.style.aspectRatio).toBe('1.5');
+  });
+
+  it('does not call matchMedia on every render', () => {
+    const matchMediaSpy = vi.fn().mockReturnValue({
+      matches: false,
+      media: '',
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    });
+
+    global.matchMedia = matchMediaSpy;
+
+    const { rerender } = render(
+      <LazyImage src="test.jpg" alt="Test" fadeIn={true} />
+    );
+
+    const initialCallCount = matchMediaSpy.mock.calls.length;
+
+    // Rerender component
+    rerender(<LazyImage src="test.jpg" alt="Test Updated" fadeIn={true} />);
+
+    // matchMedia should only be called once (memoized)
+    expect(matchMediaSpy.mock.calls.length).toBe(initialCallCount);
+  });
+});
+

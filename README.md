@@ -276,11 +276,13 @@ console.log(hash); // "LEHV6nWB2yk8pyo0adR*.7kCMdnj"
 
 Contributions welcome! Please read the [contributing guidelines](https://github.com/garrettsiegel/react-lzy-img/blob/main/CONTRIBUTING.md) before submitting PRs.
 
+For security vulnerabilities, please see our [Security Policy](https://github.com/garrettsiegel/react-lzy-img/blob/main/SECURITY.md).
+
 ## License
 
 MIT © [Garrett Siegel](https://garrettsiegel.com)
 
-## Contributing
+## Contact
 
 Feedback and contributions welcome! 
 

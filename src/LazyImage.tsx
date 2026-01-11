@@ -1,6 +1,9 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import type { ImgHTMLAttributes, CSSProperties, SyntheticEvent, ReactNode } from 'react';
 import { decode } from 'blurhash';
+
+// Constants
+const BLURHASH_CANVAS_SIZE = 32;
 
 export interface LazyImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, 
   'src' | 'alt' | 'className' | 'style' | 'width' | 'height' | 'loading' | 'onLoad' | 'onError'> {
@@ -117,7 +120,9 @@ export default function LazyImage({
   const [containerRef, isInView] = useLazyLoad(preloadMargin);
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const [blurhashError, setBlurhashError] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const imgAbortControllerRef = useRef<AbortController | null>(null);
 
   // Generate blurhash canvas when component mounts
   useEffect(() => {
@@ -129,33 +134,46 @@ export default function LazyImage({
     const canvas = canvasRef.current;
     
     try {
-      const pixels = decode(blurhash, 32, 32);
+      const pixels = decode(blurhash, BLURHASH_CANVAS_SIZE, BLURHASH_CANVAS_SIZE);
       const ctx = canvas.getContext('2d');
       if (ctx) {
-        const imageData = ctx.createImageData(32, 32);
+        const imageData = ctx.createImageData(BLURHASH_CANVAS_SIZE, BLURHASH_CANVAS_SIZE);
         imageData.data.set(pixels);
         ctx.putImageData(imageData, 0, 0);
       }
     } catch (error) {
-      // Warn about invalid blurhash
+      // Set error state and warn about invalid blurhash
       console.warn('[LazyImage] Failed to decode blurhash:', error);
+      setBlurhashError(true);
     }
 
-    // Cleanup canvas on unmount
+    // Cleanup canvas on unmount - set dimensions to 0 to release memory
     return () => {
-      const ctx = canvas.getContext('2d');
-      if (ctx) {
-        ctx.clearRect(0, 0, 32, 32);
+      if (canvas) {
+        canvas.width = 0;
+        canvas.height = 0;
       }
     };
   }, [blurhash, isLoaded]);
 
+  // Cleanup abort controller on unmount
+  useEffect(() => {
+    return () => {
+      if (imgAbortControllerRef.current) {
+        imgAbortControllerRef.current.abort();
+      }
+    };
+  }, []);
+
   // Determine when to load the actual image
   const shouldLoadImage = priority || isInView;
   
-  // Respect prefers-reduced-motion
-  const prefersReducedMotion = typeof window !== 'undefined' && 
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // Respect prefers-reduced-motion - memoized to prevent calling on every render
+  const prefersReducedMotion = useMemo(() => 
+    typeof window !== 'undefined' && 
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+    []
+  );
   const shouldAnimate = fadeIn && !prefersReducedMotion;
   
   // Container styles with dimensions and aspect ratio
@@ -163,7 +181,7 @@ export default function LazyImage({
     ...styles.wrapper,
     width,
     height,
-    ...(aspectRatio && { aspectRatio: String(aspectRatio) }),
+    ...(aspectRatio && { aspectRatio }),
     ...style,
   };
 
@@ -198,8 +216,14 @@ export default function LazyImage({
   // Error state
   if (hasError) {
     return (
-      <div ref={containerRef} className={className} style={containerStyle}>
-        <div style={styles.fallback}>
+      <div 
+        ref={containerRef} 
+        className={className} 
+        style={containerStyle}
+        role="img"
+        aria-label={`${alt} (failed to load)`}
+      >
+        <div style={styles.fallback} role="alert">
           {fallback || 'Image failed to load'}
         </div>
       </div>
@@ -207,14 +231,21 @@ export default function LazyImage({
   }
 
   return (
-    <div ref={containerRef} className={className} style={containerStyle}>
-      {/* Placeholder - blurhash canvas, lqip, or regular image */}
+    <div 
+      ref={containerRef} 
+      className={className} 
+      style={containerStyle}
+      role="img"
+      aria-label={alt}
+      aria-busy={!isLoaded && !hasError}
+    >
+      {/* Placeholder - blurhash canvas (if no error), lqip, or regular image */}
       {!isLoaded && (
-        blurhash ? (
+        (blurhash && !blurhashError) ? (
           <canvas
             ref={canvasRef}
-            width={32}
-            height={32}
+            width={BLURHASH_CANVAS_SIZE}
+            height={BLURHASH_CANVAS_SIZE}
             aria-hidden="true"
             style={placeholderStyle}
           />
