@@ -19,7 +19,7 @@ export default function Features() {
     {
       icon: DevicePhoneMobileIcon,
       title: 'Responsive Images',
-      description: 'Automatic <picture> element with srcSet and sizes support',
+      description: 'Automatic <picture> element when srcSet provided, with sizes support',
     },
     {
       icon: PhotoIcon,

@@ -49,20 +49,24 @@ export default function Examples() {
     responsive: {
       title: 'Responsive Images',
       code: `<LazyImage
-  src="https://picsum.photos/800/600"
-  srcSet="https://picsum.photos/400/300 400w,
-          https://picsum.photos/800/600 800w"
-  sizes="(max-width: 600px) 400px, 800px"
+  src="https://picsum.photos/1200/800"
+  srcSet="https://picsum.photos/600/400 600w,
+          https://picsum.photos/1200/800 1200w,
+          https://picsum.photos/1800/1200 1800w"
+  sizes="(max-width: 640px) 600px,
+         (max-width: 1024px) 1200px,
+         1800px"
   alt="Responsive image"
+  aspectRatio={3/2}
 />`,
       demo: (
         <LazyImage
-          src="https://picsum.photos/800/600?random=3"
-          srcSet="https://picsum.photos/400/300?random=3 400w, https://picsum.photos/800/600?random=3 800w"
-          sizes="(max-width: 600px) 400px, 800px"
-          alt="Responsive image"
+          src="https://picsum.photos/1200/800?random=3"
+          srcSet="https://picsum.photos/600/400?random=3 600w, https://picsum.photos/1200/800?random=3 1200w, https://picsum.photos/1800/1200?random=3 1800w"
+          sizes="(max-width: 640px) 600px, (max-width: 1024px) 1200px, 1800px"
+          alt="Responsive image with automatic picture element"
           width="100%"
-          aspectRatio={16/9}
+          aspectRatio={3/2}
           className="rounded-lg"
         />
       ),
