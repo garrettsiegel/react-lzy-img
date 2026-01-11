@@ -1,0 +1,6 @@
+{
+  "buildCommand": "npm run build:website",
+  "outputDirectory": "dist-demo",
+  "cleanUrls": true,
+  "trailingSlash": false
+}
