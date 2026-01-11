@@ -23,7 +23,7 @@ export default function Hero() {
             </h1>
           </div>
           <p className="text-2xl sm:text-3xl text-blue-50 mb-12 max-w-4xl mx-auto font-medium leading-relaxed animate-fade-in-up" style={{animationDelay: '0.2s'}}>
-            The lightweight React library for blazing-fast lazy loading with zero configuration
+            Lightweight React library for blazing-fast lazy loading with responsive images and smart placeholders
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12 animate-fade-in-up" style={{animationDelay: '0.3s'}}>

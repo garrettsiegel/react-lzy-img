@@ -1,4 +1,4 @@
-import { ClipboardDocumentIcon, BookOpenIcon, CheckIcon, CubeTransparentIcon } from '@heroicons/react/24/solid';
+import { ClipboardDocumentIcon, BookOpenIcon, CheckIcon } from '@heroicons/react/24/solid';
 import { useState } from 'react';
 
 export default function Installation() {
@@ -87,32 +87,6 @@ export default function Installation() {
   height={400}
 />`}</code>
             </pre>
-          </div>
-
-          {/* Preact Support */}
-          <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-3xl p-8 shadow-2xl border-2 border-purple-200">
-            <h3 className="text-2xl font-black text-gray-900 mb-4 flex items-center gap-3">
-              <CubeTransparentIcon className="w-7 h-7 text-purple-600" />
-              Using with Preact
-            </h3>
-            <p className="text-gray-700 mb-6 font-medium">
-              Works seamlessly with Preact! Just configure preact/compat aliasing:
-            </p>
-            <div className="bg-gray-900 rounded-2xl p-6">
-              <div className="text-purple-400 text-xs font-bold tracking-wider uppercase mb-3">Vite Configuration</div>
-              <pre className="text-sm text-gray-100 overflow-x-auto">
-                <code>{`// vite.config.js
-export default {
-  resolve: {
-    alias: {
-      'react': 'preact/compat',
-      'react-dom': 'preact/compat',
-      'react/jsx-runtime': 'preact/jsx-runtime'
-    }
-  }
-}`}</code>
-              </pre>
-            </div>
           </div>
 
           {/* API Props */}

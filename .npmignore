@@ -1,10 +1,24 @@
-# Ignore files not to be published to npm
-src/*.test.*
+# Source & Tests
+src/
+tests/
+website/
+
+# Config files
+*.config.js
+*.config.ts
+tsconfig*.json
+vitest.setup.ts
+
+# Development
+.git*
 *.log
 *.tsbuildinfo
 coverage/
-__tests__/
+node_modules/
 .vscode/
-*.config.js
-*.config.ts
+.vercel/
 *.env*
+
+# Documentation (keep README.md, LICENSE)
+index.html
+scripts/

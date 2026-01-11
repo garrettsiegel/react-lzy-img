@@ -8,46 +8,46 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [
-    react(),
+      react(),
+      ...(isLibraryBuild
+        ? [
+            dts({
+              include: ['src/index.ts', 'src/LazyImage.tsx'],
+              exclude: ['src/**/*.test.tsx', 'src/**/*.test.ts', 'tests/**', 'website/**'],
+            }),
+          ]
+        : []),
+    ],
     ...(isLibraryBuild
-      ? [
-          dts({
-            include: ['src/index.ts', 'src/LazyImage.tsx'],
-            exclude: ['src/**/*.test.tsx', 'src/**/*.test.ts', 'src/__tests__'],
-          }),
-        ]
-      : []),
-  ],
-  ...(isLibraryBuild
-    ? {
-        build: {
-          sourcemap: true,
-          lib: {
-            entry: path.resolve(__dirname, 'src/index.ts'),
-            name: 'ReactLzyImg',
-            fileName: (format) => `index.${format}.js`,
-            formats: ['es', 'cjs'],
-          },
-          rollupOptions: {
-            external: ['react', 'react-dom', 'preact', 'preact/hooks', 'blurhash'],
-            output: {
-              globals: {
-                react: 'React',
-                'react-dom': 'ReactDOM',
-                preact: 'preact',
-                'preact/hooks': 'preactHooks',
-                blurhash: 'blurhash',
+      ? {
+          build: {
+            outDir: 'dist',
+            sourcemap: true,
+            lib: {
+              entry: path.resolve(__dirname, 'src/index.ts'),
+              name: 'ReactLzyImg',
+              fileName: (format) => `index.${format}.js`,
+              formats: ['es', 'cjs'],
+            },
+            rollupOptions: {
+              external: ['react', 'react-dom', 'react/jsx-runtime', 'blurhash'],
+              output: {
+                globals: {
+                  react: 'React',
+                  'react-dom': 'ReactDOM',
+                  'react/jsx-runtime': 'ReactJSXRuntime',
+                  blurhash: 'blurhash',
+                },
               },
             },
+            minify: true,
           },
-          minify: true,
-        },
-      }
-    : {
-        root: '.',
-        build: {
-          outDir: 'dist-demo',
-        },
-      }),
+        }
+      : {
+          root: '.',
+          build: {
+            outDir: 'dist-demo',
+          },
+        }),
   };
 });

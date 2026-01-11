@@ -27,11 +27,6 @@ export default function Features() {
       description: 'Blurhash, LQIP, or standard image placeholders for better UX',
     },
     {
-      icon: CubeTransparentIcon,
-      title: 'React & Preact',
-      description: 'Works seamlessly with both React and Preact',
-    },
-    {
       icon: CubeIcon,
       title: 'Lightweight',
       description: '~1.4KB gzipped with tree-shaking support',
@@ -50,6 +45,11 @@ export default function Features() {
       icon: PuzzlePieceIcon,
       title: 'Single Component',
       description: 'One unified LazyImage component handles all use cases',
+    },
+    {
+      icon: CubeTransparentIcon,
+      title: 'Zero Config',
+      description: 'Works out of the box with sensible defaults',
     },
   ];
 

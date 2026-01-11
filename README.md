@@ -17,7 +17,6 @@ Lightweight React lazy loading library with responsive images, blurhash placehol
 - **Lazy Loading** - Intersection Observer with `loading="lazy"` fallback
 - **Responsive Images** - Automatic `<picture>` element with srcSet/sizes
 - **Smart Placeholders** - Blurhash, LQIP, or standard image placeholders
-- **React & Preact** - Works with both React and Preact
 - **Single Component** - Unified LazyImage handles all use cases
 - **Lightweight** - ~1.4KB gzipped, minimal dependencies
 - **TypeScript** - Complete type definitions and IntelliSense
@@ -27,42 +26,6 @@ Lightweight React lazy loading library with responsive images, blurhash placehol
 
 ```bash
 npm install react-lzy-img
-```
-
-### Using with Preact
-
-react-lzy-img works seamlessly with Preact! Just install and configure preact/compat aliasing:
-
-```bash
-npm install react-lzy-img preact
-```
-
-**Vite:**
-```javascript
-// vite.config.js
-export default {
-  resolve: {
-    alias: {
-      'react': 'preact/compat',
-      'react-dom': 'preact/compat',
-      'react/jsx-runtime': 'preact/jsx-runtime'
-    }
-  }
-}
-```
-
-**Webpack:**
-```javascript
-// webpack.config.js
-module.exports = {
-  resolve: {
-    alias: {
-      'react': 'preact/compat',
-      'react-dom': 'preact/compat',
-      'react/jsx-runtime': 'preact/jsx-runtime'
-    }
-  }
-}
 ```
 
 **Bundle Size:** ~1.4KB gzipped • Tree-shakeable • Single dependency (blurhash)
@@ -181,24 +144,6 @@ The component uses inline styles for minimal footprint. You can customize stylin
 ```tsx
 import { LazyImage } from 'react-lzy-img';
 ```
-
-**Preact** - Fully compatible with simple setup
-```tsx
-import { LazyImage } from 'react-lzy-img';
-// Works seamlessly with Preact!
-```
-
-> **Preact Setup**: Add to your `vite.config.js`:
-> ```js
-> export default {
->   resolve: {
->     alias: {
->       "react": "preact/compat",
->       "react-dom": "preact/compat"
->     }
->   }
-> }
-> ```
 
 ## TypeScript
 

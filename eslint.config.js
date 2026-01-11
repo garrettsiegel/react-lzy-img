@@ -4,7 +4,7 @@ import reactHooks from 'eslint-plugin-react-hooks'
 import tseslint from 'typescript-eslint'
 
 export default [
-  { ignores: ['dist', 'dist-demo'] },
+  { ignores: ['dist', 'dist-demo', 'coverage'] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
@@ -18,6 +18,16 @@ export default [
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
+    },
+  },
+  {
+    files: ['**/*.mjs', 'scripts/**/*.js'],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: 'module',
+      globals: {
+        ...globals.node,
+      },
     },
   },
 ]
