@@ -3,10 +3,23 @@ import { ArrowRightIcon, StarIcon, BoltIcon, CheckBadgeIcon } from '@heroicons/r
 export default function Hero() {
   return (
     <div className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-700 to-cyan-700">
-      {/* Animated background elements */}
+      {/* Animated background elements - optimized for smooth rendering */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-to-br from-blue-400/30 to-transparent rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-gradient-to-tl from-cyan-400/30 to-transparent rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+        <div 
+          className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-to-br from-blue-400/20 to-transparent rounded-full blur-3xl" 
+          style={{
+            animation: 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            willChange: 'opacity',
+          }}
+        ></div>
+        <div 
+          className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-gradient-to-tl from-cyan-400/20 to-transparent rounded-full blur-3xl" 
+          style={{
+            animation: 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            animationDelay: '2s',
+            willChange: 'opacity',
+          }}
+        ></div>
       </div>
       
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 sm:py-40">
@@ -17,7 +30,7 @@ export default function Hero() {
             <span className="text-sm font-semibold text-white">Lightning Fast Image Loading</span>
           </div>
           
-          <div className="animate-fade-in-up" style={{animationDelay: '0.1s'}}>
+          <div className="animate-fade-in-up" style={{animationDelay: '0.1s', willChange: 'opacity, transform'}}>
             <h1 className="text-6xl sm:text-7xl lg:text-8xl font-black text-white mb-6 tracking-tight leading-none">
               react-lzy-img
             </h1>
