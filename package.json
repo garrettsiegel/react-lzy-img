@@ -65,8 +65,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "blurhash": "^2.0.5",
-    "react-lzy-img": "^0.5.0"
+    "blurhash": "^2.0.5"
   },
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0",

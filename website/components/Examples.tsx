@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ClipboardDocumentIcon, CheckIcon } from '@heroicons/react/24/solid';
-import { LazyImage } from 'react-lzy-img';
+import { LazyImage } from '../../src';
 
 export default function Examples() {
   const [activeTab, setActiveTab] = useState('basic');
