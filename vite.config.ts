@@ -18,6 +18,11 @@ export default defineConfig(({ mode }) => {
           ]
         : []),
     ],
+    resolve: {
+      alias: mode === 'demo' ? {
+        'react-lzy-img': path.resolve(__dirname, 'dist/index.es.js'),
+      } : undefined,
+    },
     ...(isLibraryBuild
       ? {
           build: {

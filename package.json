@@ -58,7 +58,7 @@
   "scripts": {
     "dev": "vite",
     "build": "rimraf dist && vite build --mode production",
-    "build:website": "vite build --mode demo",
+    "build:website": "npm run build && vite build --mode demo",
     "prepublishOnly": "npm run build && node scripts/test-package.mjs",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
