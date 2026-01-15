@@ -206,7 +206,7 @@ export default function Examples() {
             <div className="mb-6">
               <span className="text-gray-600 text-sm font-bold tracking-wider uppercase">Live Demo</span>
             </div>
-            <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-6 border-2 border-gray-200">
+            <div key={activeTab} className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-6 border-2 border-gray-200">
               {examples[activeTab as keyof typeof examples].demo}
             </div>
           </div>
