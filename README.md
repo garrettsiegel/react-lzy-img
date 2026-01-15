@@ -80,6 +80,7 @@ import { LazyImage } from 'react-lzy-img';
 | `sizes` | `string` | - | Responsive size descriptors |
 | `placeholder` | `string` | - | Placeholder image URL |
 | `blurhash` | `string` | - | Blurhash string (canvas blur) |
+| `blurhashResolution` | `16 \| 32 \| 64` | `32` | Blurhash canvas size (lower = faster) |
 | `lqip` | `string` | - | Base64 LQIP |
 | `fadeIn` | `boolean` | `true` | Fade transition |
 | `fadeInDuration` | `number` | `300` | Fade duration (ms) |
@@ -92,6 +93,9 @@ import { LazyImage } from 'react-lzy-img';
 | `aspectRatio` | `number` | - | CSS aspect-ratio |
 | `style` | `CSSProperties` | - | Inline styles for wrapper |
 | `loading` | `'lazy' \| 'eager'` | `'lazy'` | Native loading attribute |
+| `fetchPriority` | `'high' \| 'low' \| 'auto'` | - | Browser fetch priority hint |
+| `retryAttempts` | `number` | `0` | Number of retry attempts on error |
+| `retryDelay` | `number` | `1000` | Base delay (ms) between retries |
 | `onLoad` | `function` | - | Image load event handler |
 | `onError` | `function` | - | Image error event handler |
 | `...props` | `ImgHTMLAttributes` | - | Standard `<img>` attributes |
@@ -101,20 +105,32 @@ import { LazyImage } from 'react-lzy-img';
 ## Examples
 
 ```tsx
-// Error handling
+// Error handling with retry
 <LazyImage
   src="/might-fail.jpg"
   alt="Description"
   fallback="Failed to load"
+  retryAttempts={3}
+  retryDelay={1000}
   onError={(e) => console.log('Error:', e)}
 />
 
-// Priority loading (hero images)
+// Priority loading (hero images) with high fetch priority
 <LazyImage
   src="/hero.jpg"
   alt="Hero image"
   priority
+  fetchPriority="high"
   fadeIn={false}
+/>
+
+// Custom blurhash resolution for better performance
+<LazyImage
+  src="/large-image.jpg"
+  alt="Large image"
+  blurhash="LEHV6nWB2yk8pyo0adR*.7kCMdnj"
+  blurhashResolution={16}
+  aspectRatio={16/9}
 />
 
 // Accessibility

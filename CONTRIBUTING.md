@@ -139,7 +139,7 @@ npm run test:coverage
 
 Example test:
 ```tsx
-import { render, waitFor } from '@testing-library/react';
+import { render, waitFor, fireEvent } from '@testing-library/react';
 import LazyImage from '../src/LazyImage';
 
 describe('LazyImage - Error Handling', () => {

@@ -1,9 +1,10 @@
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import type { ImgHTMLAttributes, CSSProperties, SyntheticEvent, ReactNode } from 'react';
 import { decode } from 'blurhash';
 
-// Constants
-const BLURHASH_CANVAS_SIZE = 32;
+// Types
+type BlurhashResolution = 16 | 32 | 64;
+type FetchPriority = 'high' | 'low' | 'auto';
 
 export interface LazyImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, 
   'src' | 'alt' | 'className' | 'style' | 'width' | 'height' | 'loading' | 'onLoad' | 'onError'> {
@@ -13,6 +14,8 @@ export interface LazyImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>
   sizes?: string;
   placeholder?: string;
   blurhash?: string;
+  /** Resolution for blurhash canvas rendering. Higher = better quality, lower = faster. Default: 32 */
+  blurhashResolution?: BlurhashResolution;
   lqip?: string;
   fadeIn?: boolean;
   fadeInDuration?: number;
@@ -22,9 +25,15 @@ export interface LazyImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>
   aspectRatio?: number;
   style?: CSSProperties;
   priority?: boolean;
+  /** Loading priority hint for modern browsers. 'high' for above-fold images. */
+  fetchPriority?: FetchPriority;
   preloadMargin?: string;
   fallback?: ReactNode | string;
   loading?: ImgHTMLAttributes<HTMLImageElement>['loading'];
+  /** Number of retry attempts on image load failure. Default: 0 (no retry) */
+  retryAttempts?: number;
+  /** Delay in ms between retry attempts. Default: 1000 */
+  retryDelay?: number;
   onLoad?: (event: SyntheticEvent<HTMLImageElement>) => void;
   onError?: (event: SyntheticEvent<HTMLImageElement>) => void;
 }
@@ -101,6 +110,7 @@ export default function LazyImage({
   sizes,
   placeholder,
   blurhash,
+  blurhashResolution = 32,
   lqip,
   fadeIn = true,
   fadeInDuration = 300,
@@ -110,9 +120,12 @@ export default function LazyImage({
   aspectRatio,
   style = {},
   priority = false,
+  fetchPriority,
   preloadMargin = '200px',
   fallback,
   loading,
+  retryAttempts = 0,
+  retryDelay = 1000,
   onLoad,
   onError,
   ...imageProps
@@ -121,8 +134,9 @@ export default function LazyImage({
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [blurhashError, setBlurhashError] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const imgAbortControllerRef = useRef<AbortController | null>(null);
+  const retryTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Generate blurhash canvas when component mounts
   useEffect(() => {
@@ -134,16 +148,18 @@ export default function LazyImage({
     const canvas = canvasRef.current;
     
     try {
-      const pixels = decode(blurhash, BLURHASH_CANVAS_SIZE, BLURHASH_CANVAS_SIZE);
+      const pixels = decode(blurhash, blurhashResolution, blurhashResolution);
       const ctx = canvas.getContext('2d');
       if (ctx) {
-        const imageData = ctx.createImageData(BLURHASH_CANVAS_SIZE, BLURHASH_CANVAS_SIZE);
+        const imageData = ctx.createImageData(blurhashResolution, blurhashResolution);
         imageData.data.set(pixels);
         ctx.putImageData(imageData, 0, 0);
       }
     } catch (error) {
       // Set error state and warn about invalid blurhash
+      // This is a legitimate use case - catching errors from external library decode
       console.warn('[LazyImage] Failed to decode blurhash:', error);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setBlurhashError(true);
     }
 
@@ -154,13 +170,13 @@ export default function LazyImage({
         canvas.height = 0;
       }
     };
-  }, [blurhash, isLoaded]);
+  }, [blurhash, blurhashResolution, isLoaded]);
 
-  // Cleanup abort controller on unmount
+  // Cleanup retry timeout on unmount
   useEffect(() => {
     return () => {
-      if (imgAbortControllerRef.current) {
-        imgAbortControllerRef.current.abort();
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
       }
     };
   }, []);
@@ -202,18 +218,33 @@ export default function LazyImage({
   };
 
   // Event handlers
-  const handleLoad = (event: SyntheticEvent<HTMLImageElement>) => {
+  const handleLoad = useCallback((event: SyntheticEvent<HTMLImageElement>) => {
     setIsLoaded(true);
     setHasError(false);
+    setRetryCount(0);
     onLoad?.(event);
-  };
+  }, [onLoad]);
 
-  const handleError = (event: SyntheticEvent<HTMLImageElement>) => {
-    setHasError(true);
-    onError?.(event);
-  };
+  const handleError = useCallback((event: SyntheticEvent<HTMLImageElement>) => {
+    if (retryCount < retryAttempts) {
+      // Schedule a retry
+      retryTimeoutRef.current = setTimeout(() => {
+        setRetryCount(prev => prev + 1);
+        setHasError(false);
+      }, retryDelay);
+    } else {
+      // No more retries, show error state
+      setHasError(true);
+      onError?.(event);
+    }
+  }, [retryCount, retryAttempts, retryDelay, onError]);
 
-  // Error state
+  // Generate cache-busting key for retries
+  const imageSrc = retryCount > 0 
+    ? `${src}${src.includes('?') ? '&' : '?'}_retry=${retryCount}` 
+    : src;
+
+  // Error state (only show after all retries exhausted)
   if (hasError) {
     return (
       <div 
@@ -221,7 +252,7 @@ export default function LazyImage({
         className={className} 
         style={containerStyle}
         role="img"
-        aria-label={`${alt} (failed to load)`}
+        aria-label={`${alt} (failed to load${retryAttempts > 0 ? ` after ${retryAttempts} retries` : ''})`}
       >
         <div style={styles.fallback} role="alert">
           {fallback || 'Image failed to load'}
@@ -244,8 +275,8 @@ export default function LazyImage({
         (blurhash && !blurhashError) ? (
           <canvas
             ref={canvasRef}
-            width={BLURHASH_CANVAS_SIZE}
-            height={BLURHASH_CANVAS_SIZE}
+            width={blurhashResolution}
+            height={blurhashResolution}
             aria-hidden="true"
             style={placeholderStyle}
           />
@@ -266,9 +297,10 @@ export default function LazyImage({
             <source srcSet={srcSet} sizes={sizes} />
             <img
               {...imageProps}
-              src={src}
+              src={imageSrc}
               alt={alt}
               loading={loading || (priority ? 'eager' : 'lazy')}
+              fetchPriority={fetchPriority || (priority ? 'high' : undefined)}
               onLoad={handleLoad}
               onError={handleError}
               style={imageStyle}
@@ -277,9 +309,10 @@ export default function LazyImage({
         ) : (
           <img
             {...imageProps}
-            src={src}
+            src={imageSrc}
             alt={alt}
             loading={loading || (priority ? 'eager' : 'lazy')}
+            fetchPriority={fetchPriority || (priority ? 'high' : undefined)}
             onLoad={handleLoad}
             onError={handleError}
             style={imageStyle}

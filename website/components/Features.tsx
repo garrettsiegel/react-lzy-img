@@ -7,6 +7,8 @@ import {
   CodeBracketIcon,
   UserGroupIcon,
   PuzzlePieceIcon,
+  ArrowPathIcon,
+  SignalIcon,
 } from '@heroicons/react/24/solid';
 
 export default function Features() {
@@ -24,7 +26,17 @@ export default function Features() {
     {
       icon: PhotoIcon,
       title: 'Smart Placeholders',
-      description: 'Blurhash, LQIP, or standard image placeholders for better UX',
+      description: 'Blurhash, LQIP, or standard image placeholders with configurable resolution',
+    },
+    {
+      icon: ArrowPathIcon,
+      title: 'Error Retry',
+      description: 'Automatic retry mechanism with configurable attempts and delays',
+    },
+    {
+      icon: SignalIcon,
+      title: 'Fetch Priority',
+      description: 'Browser hints for loading priority to optimize performance',
     },
     {
       icon: CubeIcon,
@@ -61,7 +73,7 @@ export default function Features() {
           Everything you need for lazy loading images in modern React applications
         </p>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
         {features.map((feature, index) => {
           const IconComponent = feature.icon;
           return (

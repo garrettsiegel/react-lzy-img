@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, waitFor } from '@testing-library/react';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { render, waitFor, fireEvent, act } from '@testing-library/react';
 import LazyImage from '../../src/LazyImage';
 
 // Mock IntersectionObserver
@@ -526,6 +526,343 @@ describe('LazyImage - Error Handling & Edge Cases', () => {
 
     // matchMedia should only be called once (memoized)
     expect(matchMediaSpy.mock.calls.length).toBe(initialCallCount);
+  });
+});
+
+describe('LazyImage - Enhanced Features', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  describe('blurhashResolution prop', () => {
+    it('uses default resolution of 32 when not specified', () => {
+      const { container } = render(
+        <LazyImage
+          src="test.jpg"
+          alt="Test"
+          blurhash="LEHV6nWB2yk8pyo0adR*.7kCMdnj"
+        />
+      );
+
+      const canvas = container.querySelector('canvas');
+      expect(canvas).toHaveAttribute('width', '32');
+      expect(canvas).toHaveAttribute('height', '32');
+    });
+
+    it('uses custom resolution of 16 for faster performance', () => {
+      const { container } = render(
+        <LazyImage
+          src="test.jpg"
+          alt="Test"
+          blurhash="LEHV6nWB2yk8pyo0adR*.7kCMdnj"
+          blurhashResolution={16}
+        />
+      );
+
+      const canvas = container.querySelector('canvas');
+      expect(canvas).toHaveAttribute('width', '16');
+      expect(canvas).toHaveAttribute('height', '16');
+    });
+
+    it('uses custom resolution of 64 for higher quality', () => {
+      const { container } = render(
+        <LazyImage
+          src="test.jpg"
+          alt="Test"
+          blurhash="LEHV6nWB2yk8pyo0adR*.7kCMdnj"
+          blurhashResolution={64}
+        />
+      );
+
+      const canvas = container.querySelector('canvas');
+      expect(canvas).toHaveAttribute('width', '64');
+      expect(canvas).toHaveAttribute('height', '64');
+    });
+  });
+
+  describe('fetchPriority prop', () => {
+    it('sets fetchPriority to high when specified', () => {
+      const { container } = render(
+        <LazyImage
+          src="test.jpg"
+          alt="Test"
+          priority
+          fetchPriority="high"
+        />
+      );
+
+      const img = container.querySelector('img');
+      expect(img).toHaveAttribute('fetchPriority', 'high');
+    });
+
+    it('sets fetchPriority to low when specified', () => {
+      const { container } = render(
+        <LazyImage
+          src="test.jpg"
+          alt="Test"
+          priority
+          fetchPriority="low"
+        />
+      );
+
+      const img = container.querySelector('img');
+      expect(img).toHaveAttribute('fetchPriority', 'low');
+    });
+
+    it('auto-sets fetchPriority to high when priority prop is true', () => {
+      const { container } = render(
+        <LazyImage
+          src="test.jpg"
+          alt="Test"
+          priority
+        />
+      );
+
+      const img = container.querySelector('img');
+      expect(img).toHaveAttribute('fetchPriority', 'high');
+    });
+
+    it('does not set fetchPriority when neither priority nor fetchPriority specified', () => {
+      const { container } = render(
+        <LazyImage
+          src="test.jpg"
+          alt="Test"
+          priority
+          fetchPriority={undefined}
+        />
+      );
+
+      // With priority=true but no explicit fetchPriority, it defaults to 'high'
+      const img = container.querySelector('img');
+      expect(img).toHaveAttribute('fetchPriority', 'high');
+    });
+  });
+
+  describe('retry mechanism', () => {
+    it('retries loading image on error when retryAttempts > 0', async () => {
+      vi.useFakeTimers();
+      
+      const onError = vi.fn();
+      const { container } = render(
+        <LazyImage
+          src="test.jpg"
+          alt="Test"
+          priority
+          retryAttempts={2}
+          retryDelay={1000}
+          onError={onError}
+        />
+      );
+
+      const img = container.querySelector('img');
+      
+      // First error - should trigger retry, not call onError yet
+      fireEvent.error(img!);
+      expect(onError).not.toHaveBeenCalled();
+
+      // Advance timer for retry delay
+      await act(async () => {
+        vi.advanceTimersByTime(1000);
+      });
+
+      // Second error - should trigger another retry
+      const imgAfterRetry = container.querySelector('img');
+      fireEvent.error(imgAfterRetry!);
+      expect(onError).not.toHaveBeenCalled();
+
+      // Advance timer for second retry
+      await act(async () => {
+        vi.advanceTimersByTime(1000);
+      });
+
+      // Third error - all retries exhausted, should call onError
+      const imgAfterSecondRetry = container.querySelector('img');
+      fireEvent.error(imgAfterSecondRetry!);
+      expect(onError).toHaveBeenCalledTimes(1);
+    });
+
+    it('adds cache-busting query param on retry', async () => {
+      vi.useFakeTimers();
+      
+      const { container } = render(
+        <LazyImage
+          src="test.jpg"
+          alt="Test"
+          priority
+          retryAttempts={1}
+          retryDelay={500}
+        />
+      );
+
+      let img = container.querySelector('img');
+      expect(img).toHaveAttribute('src', 'test.jpg');
+      
+      // Trigger error
+      fireEvent.error(img!);
+      
+      // Advance timer for retry
+      await act(async () => {
+        vi.advanceTimersByTime(500);
+      });
+
+      // After retry, src should have cache-busting param
+      img = container.querySelector('img');
+      expect(img?.getAttribute('src')).toContain('_retry=1');
+    });
+
+    it('handles URLs with existing query params during retry', async () => {
+      vi.useFakeTimers();
+      
+      const { container } = render(
+        <LazyImage
+          src="test.jpg?size=large"
+          alt="Test"
+          priority
+          retryAttempts={1}
+          retryDelay={500}
+        />
+      );
+
+      let img = container.querySelector('img');
+      expect(img).toHaveAttribute('src', 'test.jpg?size=large');
+      
+      fireEvent.error(img!);
+      
+      await act(async () => {
+        vi.advanceTimersByTime(500);
+      });
+
+      img = container.querySelector('img');
+      expect(img?.getAttribute('src')).toBe('test.jpg?size=large&_retry=1');
+    });
+
+    it('shows error state after all retries exhausted', async () => {
+      vi.useFakeTimers();
+      
+      const { container } = render(
+        <LazyImage
+          src="test.jpg"
+          alt="Test"
+          priority
+          retryAttempts={1}
+          retryDelay={100}
+          fallback="Custom error"
+        />
+      );
+
+      const img = container.querySelector('img');
+      fireEvent.error(img!);
+      
+      await act(async () => {
+        vi.advanceTimersByTime(100);
+      });
+
+      // Second error after retry
+      const imgAfterRetry = container.querySelector('img');
+      fireEvent.error(imgAfterRetry!);
+
+      // Should show error fallback now
+      expect(container.textContent).toContain('Custom error');
+    });
+
+    it('includes retry count in aria-label after failure', async () => {
+      vi.useFakeTimers();
+      
+      const { container } = render(
+        <LazyImage
+          src="test.jpg"
+          alt="Test image"
+          priority
+          retryAttempts={2}
+          retryDelay={100}
+        />
+      );
+
+      const img = container.querySelector('img');
+      
+      // Exhaust all retries
+      fireEvent.error(img!);
+      await act(async () => { vi.advanceTimersByTime(100); });
+      
+      fireEvent.error(container.querySelector('img')!);
+      await act(async () => { vi.advanceTimersByTime(100); });
+      
+      fireEvent.error(container.querySelector('img')!);
+
+      // Check aria-label includes retry info
+      const wrapper = container.querySelector('[role="img"]');
+      expect(wrapper).toHaveAttribute('aria-label', 'Test image (failed to load after 2 retries)');
+    });
+
+    it('resets retry count on successful load', async () => {
+      vi.useFakeTimers();
+      
+      const onLoad = vi.fn();
+      const { container } = render(
+        <LazyImage
+          src="test.jpg"
+          alt="Test"
+          priority
+          retryAttempts={2}
+          retryDelay={100}
+          onLoad={onLoad}
+        />
+      );
+
+      const img = container.querySelector('img');
+      
+      // First error triggers retry
+      fireEvent.error(img!);
+      await act(async () => { vi.advanceTimersByTime(100); });
+
+      // Now load succeeds
+      const imgAfterRetry = container.querySelector('img');
+      fireEvent.load(imgAfterRetry!);
+
+      expect(onLoad).toHaveBeenCalledTimes(1);
+    });
+
+    it('cleans up retry timeout on unmount', async () => {
+      vi.useFakeTimers();
+      const clearTimeoutSpy = vi.spyOn(global, 'clearTimeout');
+      
+      const { container, unmount } = render(
+        <LazyImage
+          src="test.jpg"
+          alt="Test"
+          priority
+          retryAttempts={1}
+          retryDelay={1000}
+        />
+      );
+
+      const img = container.querySelector('img');
+      fireEvent.error(img!);
+      
+      // Unmount while retry is pending
+      unmount();
+
+      expect(clearTimeoutSpy).toHaveBeenCalled();
+      clearTimeoutSpy.mockRestore();
+    });
+
+    it('does not retry when retryAttempts is 0 (default)', () => {
+      const onError = vi.fn();
+      const { container } = render(
+        <LazyImage
+          src="test.jpg"
+          alt="Test"
+          priority
+          onError={onError}
+        />
+      );
+
+      const img = container.querySelector('img');
+      fireEvent.error(img!);
+
+      // onError should be called immediately without retry
+      expect(onError).toHaveBeenCalledTimes(1);
+    });
   });
 });
 

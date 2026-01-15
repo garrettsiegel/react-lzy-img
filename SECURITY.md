@@ -6,8 +6,8 @@ We release patches for security vulnerabilities in the following versions:
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 0.5.x   | :white_check_mark: |
-| < 0.5   | :x:                |
+| 0.6.x   | :white_check_mark: |
+| < 0.6   | :x:                |
 
 ## Reporting a Vulnerability
 
@@ -28,7 +28,7 @@ We take the security of react-lzy-img seriously. If you believe you have found a
    - Fill in the details
 
 2. **Email**
-   - Send details to: [security contact - add your email]
+   - Send details to: garrett@garrettsiegel.com
    - Use subject line: `[SECURITY] react-lzy-img: Brief Description`
 
 ### What to Include

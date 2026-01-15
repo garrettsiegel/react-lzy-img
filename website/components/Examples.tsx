@@ -77,6 +77,7 @@ export default function Examples() {
   src="https://picsum.photos/800/600"
   alt="Above the fold image"
   priority={true}
+  fetchPriority="high"
   aspectRatio={16/9}
 />`,
       demo: (
@@ -84,6 +85,55 @@ export default function Examples() {
           src="https://picsum.photos/800/600?random=4"
           alt="Above the fold image"
           priority={true}
+          fetchPriority="high"
+          width="100%"
+          aspectRatio={16/9}
+          className="rounded-lg"
+        />
+      ),
+    },
+    blurhash: {
+      title: 'Blurhash Placeholder',
+      code: `<LazyImage
+  src="https://picsum.photos/800/600"
+  alt="Image with blurhash"
+  blurhash="LEHV6nWB2yk8pyo0adR*.7kCMdnj"
+  blurhashResolution={32}
+  aspectRatio={16/9}
+/>`,
+      demo: (
+        <LazyImage
+          src="https://picsum.photos/800/600?random=5"
+          alt="Image with blurhash placeholder"
+          blurhash="LEHV6nWB2yk8pyo0adR*.7kCMdnj"
+          blurhashResolution={32}
+          width="100%"
+          aspectRatio={16/9}
+          className="rounded-lg"
+        />
+      ),
+    },
+    retry: {
+      title: 'Error Retry',
+      code: `<LazyImage
+  src="https://example.com/might-fail.jpg"
+  alt="Image with retry"
+  retryAttempts={3}
+  retryDelay={1000}
+  fallback={<div>Failed after 3 retries</div>}
+  aspectRatio={16/9}
+/>`,
+      demo: (
+        <LazyImage
+          src="https://invalid-url-demo.example/image.jpg"
+          alt="Image with retry mechanism"
+          retryAttempts={2}
+          retryDelay={500}
+          fallback={
+            <div className="flex items-center justify-center h-full text-gray-600 font-semibold">
+              Failed to load after retries
+            </div>
+          }
           width="100%"
           aspectRatio={16/9}
           className="rounded-lg"

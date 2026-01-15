@@ -21,7 +21,7 @@
   "bugs": {
     "url": "https://github.com/garrettsiegel/react-lzy-img/issues"
   },
-  "author": "Garrett Siegel <garrettsiegel@gmail.com>",
+  "author": "Garrett Siegel <garrett@garrettsiegel.com>",
   "license": "MIT",
   "engines": {
     "node": ">=18.0.0",
@@ -70,7 +70,9 @@
     "prepublishOnly": "npm run build && node scripts/test-package.mjs",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "blurhash": "^2.0.5"
