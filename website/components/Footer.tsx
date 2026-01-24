@@ -1,6 +1,6 @@
 import { CodeBracketIcon, DocumentTextIcon, BugAntIcon, UserGroupIcon } from '@heroicons/react/24/solid';
 
-export default function Footer() {
+export function Footer() {
   return (
     <footer className="relative overflow-hidden bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900 text-gray-300 py-16">
       {/* Background decoration */}

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, waitFor, fireEvent, act } from '@testing-library/react';
-import LazyImage from '../../src/LazyImage';
+import { LazyImage } from '../../src/LazyImage';
 
 // Mock IntersectionObserver
 class MockIntersectionObserver {

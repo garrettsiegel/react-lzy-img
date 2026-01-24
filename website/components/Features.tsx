@@ -11,7 +11,7 @@ import {
   SignalIcon,
 } from '@heroicons/react/24/solid';
 
-export default function Features() {
+export function Features() {
   const features = [
     {
       icon: BoltIcon,

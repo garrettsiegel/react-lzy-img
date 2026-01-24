@@ -1,6 +1,6 @@
 import { ArrowRightIcon, StarIcon, BoltIcon, CheckBadgeIcon } from '@heroicons/react/24/solid';
 
-export default function Hero() {
+export function Hero() {
   return (
     <div className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-700 to-cyan-700">
       {/* Animated background elements - optimized for smooth rendering */}

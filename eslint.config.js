@@ -14,6 +14,7 @@ export default [
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
+      '@typescript-eslint/no-explicit-any': 'error',
     },
     languageOptions: {
       ecmaVersion: 2020,

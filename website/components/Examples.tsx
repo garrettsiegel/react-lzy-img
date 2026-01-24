@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { ClipboardDocumentIcon, CheckIcon } from '@heroicons/react/24/solid';
 import { LazyImage } from 'react-lzy-img';
 
-export default function Examples() {
+export function Examples() {
   const [activeTab, setActiveTab] = useState('basic');
   const [copied, setCopied] = useState(false);
 

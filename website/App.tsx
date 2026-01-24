@@ -1,10 +1,10 @@
-import Hero from './components/Hero';
-import Features from './components/Features';
-import Examples from './components/Examples';
-import Installation from './components/Installation';
-import Footer from './components/Footer';
+import { Hero } from './components/Hero';
+import { Features } from './components/Features';
+import { Examples } from './components/Examples';
+import { Installation } from './components/Installation';
+import { Footer } from './components/Footer';
 
-function App() {
+export function App() {
   return (
     <div className="min-h-screen bg-slate-50">
       <Hero />
@@ -15,5 +15,3 @@ function App() {
     </div>
   );
 }
-
-export default App;

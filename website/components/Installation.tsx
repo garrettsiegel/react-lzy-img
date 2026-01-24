@@ -1,7 +1,7 @@
 import { ClipboardDocumentIcon, BookOpenIcon, CheckIcon } from '@heroicons/react/24/solid';
 import { useState } from 'react';
 
-export default function Installation() {
+export function Installation() {
   const [copiedInstall, setCopiedInstall] = useState(false);
   const [copiedQuickStart, setCopiedQuickStart] = useState(false);
   return (

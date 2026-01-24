@@ -10,5 +10,5 @@
  * - Optimized for performance and bundle size
  */
 
-export { default as LazyImage } from './LazyImage';
+export { LazyImage } from './LazyImage';
 export type { LazyImageProps } from './LazyImage';
