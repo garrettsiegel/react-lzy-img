@@ -54,9 +54,12 @@ export function Navigation() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* LOGO */}
-          <div className="text-xl font-black tracking-tight text-gray-900 px-2 py-1">
+          <button
+            onClick={() => scrollToSection('hero')}
+            className="text-xl font-black tracking-tight text-gray-900 hover:text-blue-600 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-lg px-2 py-1"
+          >
             react-lzy-img
-          </div>
+          </button>
 
           {/* DESKTOP NAVIGATION */}
           <div className="hidden md:flex items-center gap-1">
