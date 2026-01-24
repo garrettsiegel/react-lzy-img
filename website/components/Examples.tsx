@@ -3,9 +3,16 @@ import { ClipboardDocumentIcon, CheckIcon } from '@heroicons/react/24/solid';
 import { LazyImage } from 'react-lzy-img';
 
 export function Examples() {
+  // ============================================================
+  // STATE
+  // ============================================================
   const [activeTab, setActiveTab] = useState('basic');
   const [copied, setCopied] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
+  // ============================================================
+  // DATA
+  // ============================================================
   const examples = {
     basic: {
       title: 'Basic Usage',
@@ -142,46 +149,74 @@ export function Examples() {
     },
   };
 
+  // ============================================================
+  // HANDLERS
+  // ============================================================
+  const handleTabChange = (key: string) => {
+    if (key === activeTab) return;
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setActiveTab(key);
+      setIsTransitioning(false);
+    }, 150);
+  };
+
+  const handleCopy = (code: string) => {
+    navigator.clipboard.writeText(code);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  // ============================================================
+  // RENDER
+  // ============================================================
   return (
-    <div className="bg-gradient-to-b from-slate-50 to-white py-20 sm:py-32">
+    <div className="bg-gradient-to-b from-slate-50 to-white py-24 sm:py-32">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-20">
-          <h2 className="text-5xl sm:text-6xl font-black text-gray-900 mb-6 tracking-tight">See It In Action</h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto font-medium">
-            Interactive examples showing react-lzy-img's powerful features
+        {/* HEADER */}
+        <div className="text-center mb-16">
+          <h2 className="text-4xl sm:text-5xl font-black text-gray-900 mb-4 tracking-tight">
+            See It In Action
+          </h2>
+          <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto font-medium">
+            Interactive examples showing real-world use cases
           </p>
         </div>
 
-        {/* Tabs */}
-        <div className="flex flex-wrap gap-4 mb-12 justify-center">
-          {Object.entries(examples).map(([key, { title }]) => (
+        {/* TABS */}
+        <div className="flex flex-wrap gap-3 mb-12 justify-center">
+          {Object.entries(examples).slice(0, 4).map(([key, { title }], index) => (
             <button
               key={key}
-              onClick={() => setActiveTab(key)}
-              className={`px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 ${
-                activeTab === key
-                  ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-2xl shadow-blue-500/50 scale-105'
-                  : 'bg-white text-gray-700 hover:bg-gray-50 shadow-lg hover:shadow-xl border-2 border-gray-200 hover:border-blue-300'
-              }`}
+              onClick={() => handleTabChange(key)}
+              className={`
+                px-6 py-3 rounded-xl font-bold text-base transition-all duration-200
+                focus-ring
+                ${activeTab === key
+                  ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg shadow-blue-500/30 scale-105'
+                  : 'bg-white text-gray-700 hover:bg-gray-50 shadow-md hover:shadow-lg border-2 border-gray-200 hover:border-blue-300'
+                }
+              `}
+              style={activeTab === key ? {} : { animationDelay: `${index * 0.05}s` }}
             >
               {title}
             </button>
           ))}
         </div>
 
-        {/* Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Code */}
-          <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl p-8 overflow-hidden shadow-2xl border-2 border-gray-700">
+        {/* CONTENT */}
+        <div className={`
+          grid grid-cols-1 lg:grid-cols-2 gap-8 transition-opacity duration-150
+          ${isTransitioning ? 'opacity-0' : 'opacity-100'}
+        `}>
+          {/* CODE BLOCK */}
+          <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl p-8 overflow-hidden shadow-2xl border-2 border-gray-700 noise-texture">
             <div className="flex items-center justify-between mb-6">
               <span className="text-gray-400 text-sm font-bold tracking-wider uppercase">Code</span>
               <button
-                onClick={() => {
-                  navigator.clipboard.writeText(examples[activeTab as keyof typeof examples].code);
-                  setCopied(true);
-                  setTimeout(() => setCopied(false), 2000);
-                }}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold transition-all duration-200"
+                onClick={() => handleCopy(examples[activeTab as keyof typeof examples].code)}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold transition-all duration-200 focus-ring"
+                aria-label="Copy code to clipboard"
               >
                 {copied ? (
                   <>
@@ -201,12 +236,12 @@ export function Examples() {
             </pre>
           </div>
 
-          {/* Demo */}
+          {/* DEMO PREVIEW */}
           <div className="bg-white rounded-3xl p-8 shadow-2xl border-2 border-gray-200">
             <div className="mb-6">
               <span className="text-gray-600 text-sm font-bold tracking-wider uppercase">Live Demo</span>
             </div>
-            <div key={activeTab} className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-6 border-2 border-gray-200">
+            <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-6 border-2 border-gray-200 min-h-[300px]">
               {examples[activeTab as keyof typeof examples].demo}
             </div>
           </div>

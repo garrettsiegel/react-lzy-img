@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OG Image Preview - react-lzy-img</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: #1e293b;
+    }
+    
+    .og-preview {
+      width: 1200px;
+      height: 630px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .noise-texture::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .noise-texture > * {
+      position: relative;
+      z-index: 2;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+  </style>
+</head>
+<body>
+  <div class="og-preview">
+    <!-- Hero Section -->
+    <div class="relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-700 to-cyan-700 noise-texture h-full flex items-center justify-center">
+      <!-- Animated Background -->
+      <div class="absolute inset-0 overflow-hidden">
+        <div 
+          class="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-to-br from-blue-400/20 to-transparent rounded-full blur-3xl" 
+          style="animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;"
+        ></div>
+        <div 
+          class="absolute -bottom-1/2 -right-1/2 w-full h-full bg-gradient-to-tl from-cyan-400/20 to-transparent rounded-full blur-3xl" 
+          style="animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite; animation-delay: 2s;"
+        ></div>
+      </div>
+      
+      <!-- Content -->
+      <div class="relative text-center px-8">
+        <!-- Badge -->
+        <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 mb-6">
+          <svg class="w-4 h-4 text-yellow-300" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/>
+          </svg>
+          <span class="text-sm font-semibold text-white">Lightning Fast Image Loading</span>
+        </div>
+        
+        <!-- Title -->
+        <h1 class="text-7xl font-black text-white mb-4 tracking-tight leading-none">
+          react-lzy-img
+        </h1>
+        
+        <!-- Value Prop -->
+        <p class="text-2xl text-blue-50 mb-3 font-medium">
+          Stop losing users to slow-loading images.
+        </p>
+        <p class="text-xl text-blue-100 font-normal">
+          Ship faster pages with lazy loading, responsive images, and smart placeholders — all in <span class="font-black text-white">1.4KB</span>.
+        </p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

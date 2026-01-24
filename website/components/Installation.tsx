@@ -62,7 +62,8 @@ export function Installation() {
                   setCopiedQuickStart(true);
                   setTimeout(() => setCopiedQuickStart(false), 2000);
                 }}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold transition-all duration-200"
+                className="flex items-center gap-2 px-5 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold transition-all duration-200 focus-ring min-h-[44px]"
+                aria-label="Copy quick start code"
               >
                 {copiedQuickStart ? (
                   <>
@@ -90,8 +91,8 @@ export function Installation() {
           </div>
 
           {/* API Props */}
-          <div className="bg-gradient-to-br from-white to-blue-50 rounded-3xl p-10 shadow-2xl border-2 border-blue-200">
-            <h3 className="text-3xl font-black text-gray-900 mb-8">API Reference</h3>
+          <div className="bg-gradient-to-br from-white to-blue-50 rounded-3xl p-10 shadow-2xl border-2 border-blue-200 noise-texture">
+            <h3 className="text-3xl font-black text-gray-900 mb-8">Essential Props</h3>
             <div className="space-y-6">
               <div className="border-l-4 border-blue-500 pl-4 py-2">
                 <code className="text-blue-600 font-bold text-lg">src</code>
@@ -142,7 +143,7 @@ export function Installation() {
               href="https://github.com/garrettsiegel/react-lzy-img#readme"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-10 py-5 rounded-2xl font-bold text-lg hover:shadow-2xl hover:shadow-blue-500/50 hover:scale-105 transition-all duration-300"
+              className="inline-flex items-center gap-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-10 py-5 rounded-2xl font-bold text-lg hover:shadow-2xl hover:shadow-blue-500/50 hover:scale-[1.02] transition-all duration-200 focus-ring"
             >
               <BookOpenIcon className="w-6 h-6" />
               View Full Documentation
