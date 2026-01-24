@@ -9,18 +9,20 @@ export function App() {
   return (
     <div className="min-h-screen bg-slate-50">
       <Navigation />
-      <div id="hero">
-        <Hero />
-      </div>
-      <div id="features">
-        <Features />
-      </div>
-      <div id="examples">
-        <Examples />
-      </div>
-      <div id="installation">
-        <Installation />
-      </div>
+      <main>
+        <div id="hero">
+          <Hero />
+        </div>
+        <div id="features">
+          <Features />
+        </div>
+        <div id="examples">
+          <Examples />
+        </div>
+        <div id="installation">
+          <Installation />
+        </div>
+      </main>
       <Footer />
     </div>
   );
