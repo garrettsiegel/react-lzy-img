@@ -380,6 +380,13 @@ Contributions welcome! Please read the [contributing guidelines](https://github.
 
 For security vulnerabilities, please see our [Security Policy](https://github.com/garrettsiegel/react-lzy-img/blob/main/SECURITY.md).
 
+## Funding
+
+If you'd like to support ongoing maintenance of `react-lzy-img`, you can contribute via:
+
+- **GitHub Sponsors:** [github.com/sponsors/garrettsiegel](https://github.com/sponsors/garrettsiegel)
+- **Ko-fi:** [ko-fi.com/garrettsiegel](https://ko-fi.com/garrettsiegel)
+
 ## License
 
 MIT © [Garrett Siegel](https://garrettsiegel.com)
