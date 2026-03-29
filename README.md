@@ -15,8 +15,11 @@ Lightweight React lazy loading library with responsive images, blurhash placehol
 ## Features
 
 - **Lazy Loading** - Intersection Observer with `loading="lazy"` fallback
+- **Observer Pooling** - Shared IntersectionObserver instances by `preloadMargin` for efficient large lists
 - **Responsive Images** - Automatic `<picture>` element with srcSet/sizes
 - **Smart Placeholders** - Blurhash, LQIP, or standard image placeholders
+- **Retry Logic** - Configurable retry attempts with optional exponential backoff
+- **useLazyLoad Hook** - Build custom lazy-loaded UI patterns with the exported hook
 - **Single Component** - Unified LazyImage handles all use cases
 - **Lightweight** - ~1.4KB gzipped, minimal dependencies
 - **TypeScript** - Complete type definitions and IntelliSense
@@ -96,6 +99,9 @@ import { LazyImage } from 'react-lzy-img';
 | `fetchPriority` | `'high' \| 'low' \| 'auto'` | - | Browser fetch priority hint |
 | `retryAttempts` | `number` | `0` | Number of retry attempts on error |
 | `retryDelay` | `number` | `1000` | Base delay (ms) between retries |
+| `retryBackoff` | `boolean` | `false` | Enable exponential retry delay (`retryDelay * 2^attempt`) |
+| `onPlaceholderError` | `() => void` | - | Called when blurhash placeholder fails to render |
+| `loadingLabel` | `string` | - | Screen reader loading announcement text |
 | `onLoad` | `function` | - | Image load event handler |
 | `onError` | `function` | - | Image error event handler |
 | `...props` | `ImgHTMLAttributes` | - | Standard `<img>` attributes |
@@ -112,6 +118,7 @@ import { LazyImage } from 'react-lzy-img';
   fallback="Failed to load"
   retryAttempts={3}
   retryDelay={1000}
+  retryBackoff
   onError={(e) => console.log('Error:', e)}
 />
 
@@ -137,8 +144,87 @@ import { LazyImage } from 'react-lzy-img';
 <LazyImage
   src="/logo.png"
   alt="Company logo"
+  loadingLabel="Loading company logo"
   role="img"
 />
+```
+
+## Hook API
+
+You can also build custom lazy-loaded UIs with the exported hook.
+
+```tsx
+import { useLazyLoad } from 'react-lzy-img';
+
+function LazyVideo({ src, title }: { src: string; title: string }) {
+  const [ref, isInView] = useLazyLoad('300px');
+
+  return (
+    <div ref={ref}>
+      {isInView ? <video controls src={src} /> : <p>Loading {title}...</p>}
+    </div>
+  );
+}
+```
+
+## Performance
+
+- Intersection observers are pooled by `preloadMargin`, which avoids creating one observer per image in large lists
+- Keep `preloadMargin` small (`100px` to `300px`) for dense galleries
+- Use `priority={true}` only for above-the-fold media
+- Use lower `blurhashResolution` values when rendering many placeholders at once
+- Enable `retryBackoff` for unstable networks to reduce repeated request bursts
+
+## Server-Side Rendering
+
+`react-lzy-img` is SSR-safe. When `IntersectionObserver` is unavailable, images load immediately.
+
+```tsx
+// Next.js above-the-fold image
+<LazyImage
+  src="/hero.jpg"
+  alt="Hero"
+  priority
+  fetchPriority="high"
+  width={1440}
+  height={900}
+/>
+```
+
+```tsx
+// Remix or Astro React island
+<LazyImage
+  src={product.image}
+  alt={product.name}
+  preloadMargin="250px"
+  loadingLabel={`Loading image for ${product.name}`}
+/>
+```
+
+## Advanced Patterns
+
+```tsx
+import { useLazyLoad, LazyImage } from 'react-lzy-img';
+
+function InfiniteGalleryCard({ src, alt }: { src: string; alt: string }) {
+  const [ref, isInView] = useLazyLoad('400px');
+
+  return (
+    <div ref={ref}>
+      {isInView ? (
+        <LazyImage
+          src={src}
+          alt={alt}
+          blurhashResolution={16}
+          retryAttempts={2}
+          retryBackoff
+        />
+      ) : (
+        <div style={{ aspectRatio: '16 / 9', background: '#f3f4f6' }} />
+      )}
+    </div>
+  );
+}
 ```
 
 ## Styling

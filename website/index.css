@@ -45,29 +45,7 @@
   @keyframes fade-in-up {
     0% {
       opacity: 0;
-      transform: translate3d(0, 20px, 0);
-    }
-    100% {
-      opacity: 1;
-      transform: translate3d(0, 0, 0);
-    }
-  }
-
-  @keyframes stagger-fade-in {
-    0% {
-      opacity: 0;
       transform: translateY(20px);
-    }
-    100% {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes fadeIn {
-    0% {
-      opacity: 0;
-      transform: translateY(10px);
     }
     100% {
       opacity: 1;
@@ -83,7 +61,7 @@
 
   .animate-stagger {
     opacity: 0;
-    animation: stagger-fade-in 0.5s ease-out forwards;
+    animation: fade-in-up 0.5s ease-out forwards;
   }
 
   /* NOISE TEXTURE UTILITY */

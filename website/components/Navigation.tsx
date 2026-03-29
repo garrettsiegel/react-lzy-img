@@ -1,6 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/solid';
 
+const NAV_ITEMS = [
+  { id: 'features', label: 'Features' },
+  { id: 'examples', label: 'Examples' },
+  { id: 'installation', label: 'Install' },
+];
+
 export function Navigation() {
   // ============================================================
   // STATE
@@ -16,7 +22,7 @@ export function Navigation() {
       setIsScrolled(window.scrollY > 20);
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -28,7 +34,7 @@ export function Navigation() {
     if (element) {
       const offset = 80;
       const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - offset;
+      const offsetPosition = elementPosition + window.scrollY - offset;
 
       window.scrollTo({
         top: offsetPosition,
@@ -63,11 +69,7 @@ export function Navigation() {
 
           {/* DESKTOP NAVIGATION */}
           <div className="hidden md:flex items-center gap-1">
-            {[
-              { id: 'features', label: 'Features' },
-              { id: 'examples', label: 'Examples' },
-              { id: 'installation', label: 'Install' },
-            ].map((item) => (
+            {NAV_ITEMS.map((item) => (
               <button
                 key={item.id}
                 onClick={() => scrollToSection(item.id)}
@@ -105,11 +107,7 @@ export function Navigation() {
       {isMobileMenuOpen && (
         <div className="md:hidden bg-white border-t border-gray-200 shadow-xl">
           <div className="px-4 py-6 space-y-2">
-            {[
-              { id: 'features', label: 'Features' },
-              { id: 'examples', label: 'Examples' },
-              { id: 'installation', label: 'Install' },
-            ].map((item) => (
+            {NAV_ITEMS.map((item) => (
               <button
                 key={item.id}
                 onClick={() => scrollToSection(item.id)}

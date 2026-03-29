@@ -33,6 +33,13 @@ console.log('\n🔄 Testing imports...\n');
 try {
   const ReactLazyImage = await import('../dist/index.es.js');
   console.log('✓ React import successful:', Object.keys(ReactLazyImage));
+  const expected = ['LazyImage', 'useLazyLoad'];
+  for (const exportName of expected) {
+    if (!(exportName in ReactLazyImage)) {
+      console.log(`✗ Missing export: ${exportName}`);
+      allGood = false;
+    }
+  }
 } catch (error) {
   console.log('✗ React import failed:', error.message);
   allGood = false;

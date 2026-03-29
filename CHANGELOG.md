@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-03-28
+
+### Added
+- Shared IntersectionObserver pool for reusing observers across images with matching `preloadMargin`
+- `retryBackoff` prop for exponential delay between retry attempts
+- `loadingLabel` prop for optional screen reader loading announcements
+- `onPlaceholderError` callback for blurhash placeholder failures
+- Public export for `useLazyLoad` hook and return type
+- Observer pool unit tests covering shared and isolated margin behavior
+
+### Changed
+- Retry cache-busting now preserves hash fragments and existing query parameters
+- Lazy loading hook now uses pooled observers instead of creating one observer per component
+
+### Tests
+- Added retry URL hash fragment coverage
+- Added exponential backoff timing coverage
+- Added accessibility coverage for loading status announcements
+- Added placeholder failure callback coverage
+
+## [0.7.0] - 2026-02-14
+
+### Added
+- Retry loading support with `retryAttempts` and `retryDelay`
+- `fetchPriority` prop support with automatic high priority for `priority` images
+- `blurhashResolution` prop for configurable blurhash canvas quality
+- Additional accessibility and edge-case tests for loading and failure states
+
+### Changed
+- Improved docs and examples for responsive image and placeholder usage
+
 ## [0.6.0] - 2026-01-10
 
 ### Added
@@ -65,6 +96,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Comprehensive test coverage
 - Extensive API with intuitive prop design
 
-[Unreleased]: https://github.com/garrettsiegel/react-lzy-img/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/garrettsiegel/react-lzy-img/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/garrettsiegel/react-lzy-img/compare/v0.7.0...v0.8.0
+[0.7.0]: https://github.com/garrettsiegel/react-lzy-img/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/garrettsiegel/react-lzy-img/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/garrettsiegel/react-lzy-img/releases/tag/v0.5.0

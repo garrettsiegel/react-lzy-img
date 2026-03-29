@@ -1,11 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
+import type { RefObject } from 'react';
+import { observeElement, unobserveElement } from '../utils/observerPool';
 
-/**
- * Hook for lazy loading images using IntersectionObserver
- * @param preloadMargin - Margin around viewport to start loading images (default: 200px)
- * @returns Tuple of [ref, isInView] - ref to attach to element, boolean indicating if element is in view
- */
-export function useLazyLoad(preloadMargin = '200px') {
+export type UseLazyLoadReturn = readonly [RefObject<HTMLDivElement | null>, boolean];
+
+// Hook for lazy loading with IntersectionObserver.
+export function useLazyLoad(preloadMargin = '200px'): UseLazyLoadReturn {
   const ref = useRef<HTMLDivElement>(null);
   const [isInView, setIsInView] = useState(() => 
     typeof window === 'undefined' || !('IntersectionObserver' in window)
@@ -15,18 +15,12 @@ export function useLazyLoad(preloadMargin = '200px') {
     const element = ref.current;
     if (!element || isInView) return;
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsInView(true);
-        }
-      },
-      { rootMargin: preloadMargin }
-    );
+    observeElement(element, preloadMargin, () => {
+      setIsInView(true);
+    });
 
-    observer.observe(element);
     return () => {
-      observer.disconnect();
+      unobserveElement(element, preloadMargin);
     };
   }, [preloadMargin, isInView]);
 

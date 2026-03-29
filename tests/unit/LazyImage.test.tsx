@@ -68,7 +68,9 @@ describe('LazyImage', () => {
     // Trigger intersection
     const mockObs = (global as Record<string, unknown>).mockObserver as MockIntersectionObserver | undefined;
     if (mockObs) {
-      mockObs.trigger(true);
+      await act(async () => {
+        mockObs.trigger(true);
+      });
     }
 
     await waitFor(() => {
@@ -140,7 +142,7 @@ describe('LazyImage', () => {
     const img = container.querySelector('img[alt="Test image"]') as HTMLImageElement;
     
     // Simulate error
-    img?.dispatchEvent(new Event('error'));
+    fireEvent.error(img);
     
     await waitFor(() => {
       expect(container.textContent).toContain('Failed to load');
@@ -159,7 +161,7 @@ describe('LazyImage', () => {
     );
     
     const img = container.querySelector('img[alt="Test image"]') as HTMLImageElement;
-    img?.dispatchEvent(new Event('load'));
+    fireEvent.load(img);
     
     await waitFor(() => {
       expect(onLoad).toHaveBeenCalled();
@@ -178,7 +180,7 @@ describe('LazyImage', () => {
     );
     
     const img = container.querySelector('img[alt="Test image"]') as HTMLImageElement;
-    img?.dispatchEvent(new Event('error'));
+    fireEvent.error(img);
     
     await waitFor(() => {
       expect(onError).toHaveBeenCalled();
@@ -292,7 +294,9 @@ describe('LazyImage', () => {
     // Trigger intersection
     const mockObs = (global as Record<string, unknown>).mockObserver as MockIntersectionObserver | undefined;
     if (mockObs) {
-      mockObs.trigger(true);
+      await act(async () => {
+        mockObs.trigger(true);
+      });
     }
 
     await waitFor(() => {
@@ -382,8 +386,7 @@ describe('LazyImage - Error Handling & Edge Cases', () => {
 
     const img = container.querySelector('img[alt="Test image"]');
     if (img) {
-      const loadEvent = new Event('load');
-      img.dispatchEvent(loadEvent);
+      fireEvent.load(img);
     }
 
     await waitFor(() => {
@@ -403,8 +406,7 @@ describe('LazyImage - Error Handling & Edge Cases', () => {
 
     const img = container.querySelector('img');
     if (img) {
-      const errorEvent = new Event('error');
-      img.dispatchEvent(errorEvent);
+      fireEvent.error(img);
     }
 
     await waitFor(() => {
@@ -436,6 +438,8 @@ describe('LazyImage - Error Handling & Edge Cases', () => {
   });
 
   it('handles empty src gracefully', () => {
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
     const { container } = render(
       <LazyImage 
         src="" 
@@ -447,6 +451,8 @@ describe('LazyImage - Error Handling & Edge Cases', () => {
     // Should still render container even with empty src
     const wrapper = container.firstChild as HTMLElement;
     expect(wrapper).toBeInTheDocument();
+
+    consoleErrorSpy.mockRestore();
   });
 
   it('warns about invalid blurhash and sets error state', () => {
@@ -463,7 +469,7 @@ describe('LazyImage - Error Handling & Edge Cases', () => {
     // Should warn about invalid blurhash
     expect(consoleSpy).toHaveBeenCalledWith(
       expect.stringContaining('[LazyImage] Failed to decode blurhash'),
-      expect.any(Error)
+      expect.any(String)
     );
 
     consoleSpy.mockRestore();
@@ -639,6 +645,34 @@ describe('LazyImage - Enhanced Features', () => {
   });
 
   describe('retry mechanism', () => {
+    it('clamps retryAttempts to a maximum of 10', async () => {
+      vi.useFakeTimers();
+
+      const onError = vi.fn();
+      const { container } = render(
+        <LazyImage
+          src="test.jpg"
+          alt="Test"
+          priority
+          retryAttempts={1000}
+          retryDelay={10}
+          onError={onError}
+        />
+      );
+
+      for (let index = 0; index < 10; index += 1) {
+        fireEvent.error(container.querySelector('img')!);
+        expect(onError).not.toHaveBeenCalled();
+
+        await act(async () => {
+          vi.advanceTimersByTime(10);
+        });
+      }
+
+      fireEvent.error(container.querySelector('img')!);
+      expect(onError).toHaveBeenCalledTimes(1);
+    });
+
     it('retries loading image on error when retryAttempts > 0', async () => {
       vi.useFakeTimers();
       
@@ -734,6 +768,58 @@ describe('LazyImage - Enhanced Features', () => {
 
       img = container.querySelector('img');
       expect(img?.getAttribute('src')).toBe('test.jpg?size=large&_retry=1');
+    });
+
+    it('handles URLs with hash fragments during retry', async () => {
+      vi.useFakeTimers();
+
+      const { container } = render(
+        <LazyImage
+          src="test.jpg?size=large#hero"
+          alt="Test"
+          priority
+          retryAttempts={1}
+          retryDelay={500}
+        />
+      );
+
+      const img = container.querySelector('img');
+      fireEvent.error(img!);
+
+      await act(async () => {
+        vi.advanceTimersByTime(500);
+      });
+
+      const retriedImage = container.querySelector('img');
+      expect(retriedImage?.getAttribute('src')).toBe('test.jpg?size=large&_retry=1#hero');
+    });
+
+    it('applies exponential delay when retryBackoff is enabled', async () => {
+      vi.useFakeTimers();
+      const timeoutSpy = vi.spyOn(global, 'setTimeout');
+
+      const { container } = render(
+        <LazyImage
+          src="test.jpg"
+          alt="Test"
+          priority
+          retryAttempts={2}
+          retryDelay={1000}
+          retryBackoff
+        />
+      );
+
+      fireEvent.error(container.querySelector('img')!);
+      expect(timeoutSpy).toHaveBeenLastCalledWith(expect.any(Function), 1000);
+
+      await act(async () => {
+        vi.advanceTimersByTime(1000);
+      });
+
+      fireEvent.error(container.querySelector('img')!);
+      expect(timeoutSpy).toHaveBeenLastCalledWith(expect.any(Function), 2000);
+
+      timeoutSpy.mockRestore();
     });
 
     it('shows error state after all retries exhausted', async () => {
@@ -862,6 +948,103 @@ describe('LazyImage - Enhanced Features', () => {
 
       // onError should be called immediately without retry
       expect(onError).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('loadingLabel accessibility', () => {
+    it('renders loading status text while image is loading', () => {
+      const { container } = render(
+        <LazyImage
+          src="test.jpg"
+          alt="Test"
+          priority
+          loadingLabel="Loading image"
+        />
+      );
+
+      const status = container.querySelector('[role="status"]');
+      expect(status).toBeInTheDocument();
+      expect(status?.textContent).toBe('Loading image');
+    });
+
+    it('clears loading status text after image loads', async () => {
+      const { container } = render(
+        <LazyImage
+          src="test.jpg"
+          alt="Test"
+          priority
+          loadingLabel="Loading image"
+        />
+      );
+
+      fireEvent.load(container.querySelector('img')!);
+
+      await waitFor(() => {
+        const status = container.querySelector('[role="status"]');
+        expect(status?.textContent).toBe('');
+      });
+    });
+
+    it('does not render status region when loadingLabel is not provided', () => {
+      const { container } = render(
+        <LazyImage
+          src="test.jpg"
+          alt="Test"
+          priority
+        />
+      );
+
+      const status = container.querySelector('[role="status"]');
+      expect(status).not.toBeInTheDocument();
+    });
+  });
+
+  describe('onPlaceholderError callback', () => {
+    it('calls onPlaceholderError when blurhash rendering fails', () => {
+      const onPlaceholderError = vi.fn();
+      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      render(
+        <LazyImage
+          src="test.jpg"
+          alt="Test"
+          blurhash="invalid"
+          onPlaceholderError={onPlaceholderError}
+        />
+      );
+
+      expect(onPlaceholderError).toHaveBeenCalledTimes(1);
+      consoleSpy.mockRestore();
+    });
+
+    it('does not call onPlaceholderError for valid blurhash', () => {
+      const onPlaceholderError = vi.fn();
+      const mockContext = {
+        createImageData: vi.fn(() => ({ data: new Uint8ClampedArray(32 * 32 * 4) } as ImageData)),
+        putImageData: vi.fn(),
+      } as unknown as CanvasRenderingContext2D;
+      const getContextSpy = vi
+        .spyOn(HTMLCanvasElement.prototype, 'getContext')
+        .mockReturnValue(mockContext);
+
+      render(
+        <LazyImage
+          src="test.jpg"
+          alt="Test"
+          blurhash="LEHV6nWB2yk8pyo0adR*.7kCMdnj"
+          onPlaceholderError={onPlaceholderError}
+        />
+      );
+
+      expect(onPlaceholderError).not.toHaveBeenCalled();
+      getContextSpy.mockRestore();
+    });
+  });
+
+  describe('public exports', () => {
+    it('exports useLazyLoad from package entrypoint', async () => {
+      const module = await import('../../src');
+      expect(typeof module.useLazyLoad).toBe('function');
     });
   });
 });

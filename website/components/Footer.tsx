@@ -102,7 +102,7 @@ export function Footer() {
               </li>
               <li className="flex items-center gap-2 min-h-[32px]">
                 <span className="w-2 h-2 bg-blue-400 rounded-full"></span>
-                <span>Test Coverage: 88%</span>
+                <span>Test Coverage: 97%</span>
               </li>
               <li className="flex items-center gap-2 min-h-[32px]">
                 <span className="w-2 h-2 bg-cyan-400 rounded-full"></span>

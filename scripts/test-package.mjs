@@ -19,9 +19,9 @@ console.log('🧪 Testing react-lzy-img package exports...\n');
 let passed = 0;
 let failed = 0;
 
-function test(name, fn) {
+async function test(name, fn) {
   try {
-    fn();
+    await fn();
     console.log(`✅ ${name}`);
     passed++;
   } catch (error) {
@@ -32,13 +32,13 @@ function test(name, fn) {
 }
 
 // Test 1: Check package.json exports
-test('package.json has correct exports configuration', () => {
+await test('package.json has correct exports configuration', () => {
   const pkg = require('../package.json');
   if (!pkg.exports['.']) throw new Error('Missing default export');
 });
 
 // Test 2: Verify React build files exist
-test('React build files exist', () => {
+await test('React build files exist', () => {
   const files = ['dist/index.d.ts', 'dist/index.es.js', 'dist/index.cjs.js'];
   for (const file of files) {
     const path = resolve(projectRoot, file);
@@ -47,19 +47,20 @@ test('React build files exist', () => {
 });
 
 // Test 3: Import React version
-test('Can import React version', async () => {
-  const { LazyImage } = await import('../dist/index.es.js');
+await test('Can import React exports', async () => {
+  const { LazyImage, useLazyLoad } = await import('../dist/index.es.js');
   if (typeof LazyImage !== 'function') throw new Error('LazyImage is not a function');
+  if (typeof useLazyLoad !== 'function') throw new Error('useLazyLoad is not a function');
 });
 
 // Test 4: Verify type definitions
-test('TypeScript definitions exist', () => {
+await test('TypeScript definitions exist', () => {
   const reactTypes = resolve(projectRoot, 'dist/index.d.ts');
   if (!existsSync(reactTypes)) throw new Error('React types missing');
 });
 
 // Test 5: Check build size is reasonable
-test('Build size is within acceptable range', () => {
+await test('Build size is within acceptable range', () => {
   const fs = require('fs');
   const reactSize = fs.statSync(resolve(projectRoot, 'dist/index.es.js')).size;
   

@@ -5,6 +5,9 @@ import {
   DevicePhoneMobileIcon,
   CubeIcon,
   UserGroupIcon,
+  ArrowPathIcon,
+  WrenchScrewdriverIcon,
+  SignalIcon,
 } from '@heroicons/react/24/solid';
 
 export function Features() {
@@ -45,6 +48,21 @@ export function Features() {
       title: 'Accessible',
       description: 'Built-in ARIA support and screen reader friendly',
     },
+    {
+      icon: ArrowPathIcon,
+      title: 'Observer Pooling',
+      description: 'Shared IntersectionObserver instances by margin for efficient gallery rendering',
+    },
+    {
+      icon: SignalIcon,
+      title: 'Retry + Backoff',
+      description: 'Recover from transient failures with configurable retries and exponential delay',
+    },
+    {
+      icon: WrenchScrewdriverIcon,
+      title: 'useLazyLoad Hook',
+      description: 'Build custom lazy-loading UIs with a typed standalone hook export',
+    },
   ];
 
   // ============================================================
@@ -68,7 +86,7 @@ export function Features() {
           const IconComponent = feature.icon;
           return (
             <div
-              key={index}
+              key={feature.title}
               className="group relative bg-white p-8 rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-gray-100 hover:border-blue-200 hover:-translate-y-1 cursor-pointer overflow-hidden noise-texture animate-stagger"
               style={{ animationDelay: `${index * 0.1}s` }}
             >
@@ -96,7 +114,7 @@ export function Features() {
           const IconComponent = feature.icon;
           return (
             <div
-              key={index}
+              key={feature.title}
               className="group flex items-start gap-4 p-6 bg-gray-50 rounded-2xl hover:bg-white hover:shadow-md transition-all duration-200 animate-stagger"
               style={{ animationDelay: `${(index + 3) * 0.1}s` }}
             >

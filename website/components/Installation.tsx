@@ -1,6 +1,19 @@
 import { ClipboardDocumentIcon, BookOpenIcon, CheckIcon } from '@heroicons/react/24/solid';
 import { useState } from 'react';
 
+async function copyToClipboard(content: string): Promise<boolean> {
+  if (typeof navigator === 'undefined' || !navigator.clipboard?.writeText) {
+    return false;
+  }
+
+  try {
+    await navigator.clipboard.writeText(content);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export function Installation() {
   const [copiedInstall, setCopiedInstall] = useState(false);
   const [copiedQuickStart, setCopiedQuickStart] = useState(false);
@@ -20,12 +33,16 @@ export function Installation() {
             <div className="flex items-center justify-between mb-6">
               <span className="text-gray-400 text-sm font-bold tracking-wider uppercase">Install</span>
               <button
-                onClick={() => {
-                  navigator.clipboard.writeText('npm install react-lzy-img');
+                onClick={async () => {
+                  const copied = await copyToClipboard('npm install react-lzy-img');
+                  if (!copied) {
+                    return;
+                  }
                   setCopiedInstall(true);
                   setTimeout(() => setCopiedInstall(false), 2000);
                 }}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold transition-all duration-200"
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold transition-all duration-200 focus-ring min-h-[44px]"
+                aria-label="Copy install command"
               >
                 {copiedInstall ? (
                   <>
@@ -50,8 +67,8 @@ export function Installation() {
             <div className="flex items-center justify-between mb-6">
               <span className="text-gray-400 text-sm font-bold tracking-wider uppercase">Quick Start</span>
               <button
-                onClick={() => {
-                  navigator.clipboard.writeText(`import { LazyImage } from 'react-lzy-img';
+                onClick={async () => {
+                  const copied = await copyToClipboard(`import { LazyImage } from 'react-lzy-img';
 
 <LazyImage
   src="/image.jpg"
@@ -59,6 +76,9 @@ export function Installation() {
   width={600}
   height={400}
 />`);
+                  if (!copied) {
+                    return;
+                  }
                   setCopiedQuickStart(true);
                   setTimeout(() => setCopiedQuickStart(false), 2000);
                 }}
@@ -133,6 +153,26 @@ export function Installation() {
                 <code className="text-cyan-600 font-bold text-lg">fadeIn</code>
                 <span className="text-gray-500 ml-2 font-medium">boolean (default: true)</span>
                 <p className="text-gray-600 mt-1.5">Enable fade-in animation on load</p>
+              </div>
+              <div className="border-l-4 border-cyan-500 pl-4 py-2">
+                <code className="text-cyan-600 font-bold text-lg">fallback</code>
+                <span className="text-gray-500 ml-2 font-medium">ReactNode | string</span>
+                <p className="text-gray-600 mt-1.5">Error-state UI when image loading fails</p>
+              </div>
+              <div className="border-l-4 border-cyan-500 pl-4 py-2">
+                <code className="text-cyan-600 font-bold text-lg">retryAttempts</code>
+                <span className="text-gray-500 ml-2 font-medium">number</span>
+                <p className="text-gray-600 mt-1.5">How many times to retry failed image requests</p>
+              </div>
+              <div className="border-l-4 border-cyan-500 pl-4 py-2">
+                <code className="text-cyan-600 font-bold text-lg">loadingLabel</code>
+                <span className="text-gray-500 ml-2 font-medium">string</span>
+                <p className="text-gray-600 mt-1.5">Optional screen reader announcement while loading</p>
+              </div>
+              <div className="border-l-4 border-cyan-500 pl-4 py-2">
+                <code className="text-cyan-600 font-bold text-lg">fetchPriority</code>
+                <span className="text-gray-500 ml-2 font-medium">'high' | 'low' | 'auto'</span>
+                <p className="text-gray-600 mt-1.5">Browser fetch priority hint for image loading order</p>
               </div>
             </div>
           </div>

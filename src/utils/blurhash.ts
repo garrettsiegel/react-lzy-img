@@ -2,13 +2,7 @@ import { decode } from 'blurhash';
 
 export type BlurhashResolution = 16 | 32 | 64;
 
-/**
- * Renders a blurhash to a canvas element
- * @param canvas - Canvas element to render to
- * @param blurhash - Blurhash string to decode
- * @param resolution - Resolution for rendering (16, 32, or 64)
- * @returns boolean indicating success or failure
- */
+// Render a blurhash to a canvas element.
 export function renderBlurhash(
   canvas: HTMLCanvasElement,
   blurhash: string,
@@ -25,15 +19,13 @@ export function renderBlurhash(
     }
     return false;
   } catch (error) {
-    console.warn('[LazyImage] Failed to decode blurhash:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.warn('[LazyImage] Failed to decode blurhash:', errorMessage);
     return false;
   }
 }
 
-/**
- * Cleans up canvas by setting dimensions to 0 to release memory
- * @param canvas - Canvas element to cleanup
- */
+// Release canvas memory by resetting dimensions.
 export function cleanupCanvas(canvas: HTMLCanvasElement | null): void {
   if (canvas) {
     canvas.width = 0;

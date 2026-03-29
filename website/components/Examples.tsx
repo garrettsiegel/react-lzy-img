@@ -2,21 +2,33 @@ import { useState } from 'react';
 import { ClipboardDocumentIcon, CheckIcon } from '@heroicons/react/24/solid';
 import { LazyImage } from 'react-lzy-img';
 
-export function Examples() {
-  // ============================================================
-  // STATE
-  // ============================================================
-  const [activeTab, setActiveTab] = useState('basic');
-  const [copied, setCopied] = useState(false);
-  const [isTransitioning, setIsTransitioning] = useState(false);
+async function copyToClipboard(content: string): Promise<boolean> {
+  if (typeof navigator === 'undefined' || !navigator.clipboard?.writeText) {
+    return false;
+  }
 
-  // ============================================================
-  // DATA
-  // ============================================================
-  const examples = {
-    basic: {
-      title: 'Basic Usage',
-      code: `import { LazyImage } from 'react-lzy-img';
+  try {
+    await navigator.clipboard.writeText(content);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+type ExampleKey = 'basic' | 'placeholder' | 'responsive' | 'priority' | 'blurhash' | 'retry';
+
+interface ExampleConfig {
+  title: string;
+  code: string;
+  demo: JSX.Element;
+}
+
+const EXAMPLE_KEYS: ExampleKey[] = ['basic', 'placeholder', 'responsive', 'priority', 'blurhash', 'retry'];
+
+const EXAMPLES: Record<ExampleKey, ExampleConfig> = {
+  basic: {
+    title: 'Basic Usage',
+    code: `import { LazyImage } from 'react-lzy-img';
 
 <LazyImage
   src="https://picsum.photos/800/600"
@@ -24,38 +36,38 @@ export function Examples() {
   width={800}
   height={600}
 />`,
-      demo: (
-        <LazyImage
-          src="https://picsum.photos/800/600"
-          alt="Beautiful landscape"
-          width="100%"
-          aspectRatio={16/9}
-          className="rounded-lg"
-        />
-      ),
-    },
-    placeholder: {
-      title: 'With Placeholder',
-      code: `<LazyImage
+    demo: (
+      <LazyImage
+        src="https://picsum.photos/800/600"
+        alt="Beautiful landscape"
+        width="100%"
+        aspectRatio={16 / 9}
+        className="rounded-lg"
+      />
+    ),
+  },
+  placeholder: {
+    title: 'With Placeholder',
+    code: `<LazyImage
   src="https://picsum.photos/800/600"
   placeholder="https://picsum.photos/80/60"
   alt="Image with placeholder"
   aspectRatio={16/9}
 />`,
-      demo: (
-        <LazyImage
-          src="https://picsum.photos/800/600?random=2"
-          placeholder="https://picsum.photos/80/60?random=2"
-          alt="Image with placeholder"
-          width="100%"
-          aspectRatio={16/9}
-          className="rounded-lg"
-        />
-      ),
-    },
-    responsive: {
-      title: 'Responsive Images',
-      code: `<LazyImage
+    demo: (
+      <LazyImage
+        src="https://picsum.photos/800/600?random=2"
+        placeholder="https://picsum.photos/80/60?random=2"
+        alt="Image with placeholder"
+        width="100%"
+        aspectRatio={16 / 9}
+        className="rounded-lg"
+      />
+    ),
+  },
+  responsive: {
+    title: 'Responsive Images',
+    code: `<LazyImage
   src="https://picsum.photos/1200/800"
   srcSet="https://picsum.photos/600/400 600w,
           https://picsum.photos/1200/800 1200w,
@@ -66,93 +78,105 @@ export function Examples() {
   alt="Responsive image"
   aspectRatio={3/2}
 />`,
-      demo: (
-        <LazyImage
-          src="https://picsum.photos/1200/800?random=3"
-          srcSet="https://picsum.photos/600/400?random=3 600w, https://picsum.photos/1200/800?random=3 1200w, https://picsum.photos/1800/1200?random=3 1800w"
-          sizes="(max-width: 640px) 600px, (max-width: 1024px) 1200px, 1800px"
-          alt="Responsive image with automatic picture element"
-          width="100%"
-          aspectRatio={3/2}
-          className="rounded-lg"
-        />
-      ),
-    },
-    priority: {
-      title: 'Priority Loading',
-      code: `<LazyImage
+    demo: (
+      <LazyImage
+        src="https://picsum.photos/1200/800?random=3"
+        srcSet="https://picsum.photos/600/400?random=3 600w, https://picsum.photos/1200/800?random=3 1200w, https://picsum.photos/1800/1200?random=3 1800w"
+        sizes="(max-width: 640px) 600px, (max-width: 1024px) 1200px, 1800px"
+        alt="Responsive image with automatic picture element"
+        width="100%"
+        aspectRatio={3 / 2}
+        className="rounded-lg"
+      />
+    ),
+  },
+  priority: {
+    title: 'Priority Loading',
+    code: `<LazyImage
   src="https://picsum.photos/800/600"
   alt="Above the fold image"
   priority={true}
   fetchPriority="high"
   aspectRatio={16/9}
 />`,
-      demo: (
-        <LazyImage
-          src="https://picsum.photos/800/600?random=4"
-          alt="Above the fold image"
-          priority={true}
-          fetchPriority="high"
-          width="100%"
-          aspectRatio={16/9}
-          className="rounded-lg"
-        />
-      ),
-    },
-    blurhash: {
-      title: 'Blurhash Placeholder',
-      code: `<LazyImage
+    demo: (
+      <LazyImage
+        src="https://picsum.photos/800/600?random=4"
+        alt="Above the fold image"
+        priority={true}
+        fetchPriority="high"
+        width="100%"
+        aspectRatio={16 / 9}
+        className="rounded-lg"
+      />
+    ),
+  },
+  blurhash: {
+    title: 'Blurhash Placeholder',
+    code: `<LazyImage
   src="https://picsum.photos/800/600"
   alt="Image with blurhash"
   blurhash="LEHV6nWB2yk8pyo0adR*.7kCMdnj"
   blurhashResolution={32}
   aspectRatio={16/9}
 />`,
-      demo: (
-        <LazyImage
-          src="https://picsum.photos/800/600?random=5"
-          alt="Image with blurhash placeholder"
-          blurhash="LEHV6nWB2yk8pyo0adR*.7kCMdnj"
-          blurhashResolution={32}
-          width="100%"
-          aspectRatio={16/9}
-          className="rounded-lg"
-        />
-      ),
-    },
-    retry: {
-      title: 'Error Retry',
-      code: `<LazyImage
+    demo: (
+      <LazyImage
+        src="https://picsum.photos/800/600?random=5"
+        alt="Image with blurhash placeholder"
+        blurhash="LEHV6nWB2yk8pyo0adR*.7kCMdnj"
+        blurhashResolution={32}
+        width="100%"
+        aspectRatio={16 / 9}
+        className="rounded-lg"
+      />
+    ),
+  },
+  retry: {
+    title: 'Resilient Loading',
+    code: `<LazyImage
   src="https://example.com/might-fail.jpg"
   alt="Image with retry"
   retryAttempts={3}
   retryDelay={1000}
+  retryBackoff
+  loadingLabel="Loading resilient image"
   fallback={<div>Failed after 3 retries</div>}
   aspectRatio={16/9}
 />`,
-      demo: (
-        <LazyImage
-          src="https://invalid-url-demo.example/image.jpg"
-          alt="Image with retry mechanism"
-          retryAttempts={2}
-          retryDelay={500}
-          fallback={
-            <div className="flex items-center justify-center h-full text-gray-600 font-semibold">
-              Failed to load after retries
-            </div>
-          }
-          width="100%"
-          aspectRatio={16/9}
-          className="rounded-lg"
-        />
-      ),
-    },
-  };
+    demo: (
+      <LazyImage
+        src="https://invalid-url-demo.example/image.jpg"
+        alt="Image with retry mechanism"
+        retryAttempts={2}
+        retryDelay={500}
+        retryBackoff
+        loadingLabel="Loading resilient image"
+        fallback={
+          <div className="flex items-center justify-center h-full text-gray-600 font-semibold">
+            Failed to load after retries
+          </div>
+        }
+        width="100%"
+        aspectRatio={16 / 9}
+        className="rounded-lg"
+      />
+    ),
+  },
+};
+
+export function Examples() {
+  // ============================================================
+  // STATE
+  // ============================================================
+  const [activeTab, setActiveTab] = useState<ExampleKey>('basic');
+  const [copied, setCopied] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   // ============================================================
   // HANDLERS
   // ============================================================
-  const handleTabChange = (key: string) => {
+  const handleTabChange = (key: ExampleKey) => {
     if (key === activeTab) return;
     setIsTransitioning(true);
     setTimeout(() => {
@@ -161,8 +185,11 @@ export function Examples() {
     }, 150);
   };
 
-  const handleCopy = (code: string) => {
-    navigator.clipboard.writeText(code);
+  const handleCopy = async (code: string) => {
+    const copiedToClipboard = await copyToClipboard(code);
+    if (!copiedToClipboard) {
+      return;
+    }
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -170,6 +197,8 @@ export function Examples() {
   // ============================================================
   // RENDER
   // ============================================================
+  const activeExample = EXAMPLES[activeTab];
+
   return (
     <div className="bg-gradient-to-b from-slate-50 to-white py-24 sm:py-32">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -185,7 +214,7 @@ export function Examples() {
 
         {/* TABS */}
         <div className="flex flex-wrap gap-3 mb-12 justify-center">
-          {Object.entries(examples).slice(0, 4).map(([key, { title }], index) => (
+          {EXAMPLE_KEYS.map((key, index) => (
             <button
               key={key}
               onClick={() => handleTabChange(key)}
@@ -199,7 +228,7 @@ export function Examples() {
               `}
               style={activeTab === key ? {} : { animationDelay: `${index * 0.05}s` }}
             >
-              {title}
+              {EXAMPLES[key].title}
             </button>
           ))}
         </div>
@@ -214,7 +243,7 @@ export function Examples() {
             <div className="flex items-center justify-between mb-6">
               <span className="text-gray-400 text-sm font-bold tracking-wider uppercase">Code</span>
               <button
-                onClick={() => handleCopy(examples[activeTab as keyof typeof examples].code)}
+                onClick={async () => handleCopy(activeExample.code)}
                 className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold transition-all duration-200 focus-ring"
                 aria-label="Copy code to clipboard"
               >
@@ -232,7 +261,7 @@ export function Examples() {
               </button>
             </div>
             <pre className="text-sm text-gray-100 overflow-x-auto">
-              <code>{examples[activeTab as keyof typeof examples].code}</code>
+              <code>{activeExample.code}</code>
             </pre>
           </div>
 
@@ -242,7 +271,7 @@ export function Examples() {
               <span className="text-gray-600 text-sm font-bold tracking-wider uppercase">Live Demo</span>
             </div>
             <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-6 border-2 border-gray-200 min-h-[300px]">
-              {examples[activeTab as keyof typeof examples].demo}
+              {activeExample.demo}
             </div>
           </div>
         </div>
