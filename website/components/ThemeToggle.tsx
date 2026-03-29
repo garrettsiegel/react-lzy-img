@@ -1,4 +1,4 @@
-import { MoonIcon, SunIcon } from '@heroicons/react/24/solid';
+import { MoonIcon, SunIcon } from '@heroicons/react/24/outline';
 import { useEffect, useState } from 'react';
 
 type ThemePreference = 'light' | 'dark' | 'system';
@@ -73,33 +73,19 @@ export function ThemeToggle() {
     setTheme(isCurrentlyDark ? 'light' : 'dark');
   };
 
-  const handleUseSystemTheme = () => {
-    setTheme('system');
-  };
-
   // ============================================================
   // RENDER
   // ============================================================
   const isDark = theme === 'dark' || (theme === 'system' && typeof window !== 'undefined' && isSystemDark());
 
   return (
-    <div className="flex items-center gap-2">
-      <button
-        type="button"
-        onClick={handleToggleTheme}
-        className="focus-ring inline-flex h-10 w-10 items-center justify-center rounded-md border border-gray-200 bg-white text-gray-600 transition-colors hover:border-gray-300 hover:text-gray-900 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:border-gray-600 dark:hover:text-white"
-        aria-label={isDark ? 'Switch to light theme' : 'Switch to dark theme'}
-      >
-        {isDark ? <SunIcon className="h-5 w-5" /> : <MoonIcon className="h-5 w-5" />}
-      </button>
-      <button
-        type="button"
-        onClick={handleUseSystemTheme}
-        className="focus-ring hidden rounded-md border border-gray-200 px-2 py-1 text-xs font-semibold text-gray-500 transition-colors hover:border-gray-300 hover:text-gray-900 sm:inline-flex dark:border-gray-700 dark:text-gray-400 dark:hover:border-gray-600 dark:hover:text-white"
-        aria-label="Use system theme"
-      >
-        System
-      </button>
-    </div>
+    <button
+      type="button"
+      onClick={handleToggleTheme}
+      className="focus-ring inline-flex h-9 w-9 items-center justify-center rounded-lg p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
+      aria-label={isDark ? 'Switch to light theme' : 'Switch to dark theme'}
+    >
+      {isDark ? <SunIcon className="h-4 w-4" /> : <MoonIcon className="h-4 w-4" />}
+    </button>
   );
 }

@@ -141,7 +141,7 @@ export function Navigation() {
       <nav
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-200 ${
           isScrolled
-            ? 'glass border-b border-gray-200/80 dark:border-gray-800/80'
+            ? 'glass border-x-0 border-t-0 border-b border-gray-200/80 dark:border-gray-800/80'
             : 'bg-transparent'
         }`}
       >
@@ -178,9 +178,12 @@ export function Navigation() {
               href="https://github.com/garrettsiegel/react-lzy-img"
               target="_blank"
               rel="noopener noreferrer"
-              className="focus-ring ml-2 rounded-md border border-gray-300 px-3 py-2 text-sm font-semibold text-gray-700 transition-colors hover:border-gray-400 hover:text-gray-900 dark:border-gray-700 dark:text-gray-300 dark:hover:border-gray-600 dark:hover:text-white"
+              aria-label="Open GitHub repository"
+              className="focus-ring ml-1 inline-flex h-9 w-9 items-center justify-center rounded-lg p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
             >
-              GitHub
+              <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4 fill-current">
+                <path d="M12 1.5a10.5 10.5 0 0 0-3.32 20.46c.53.1.72-.23.72-.5v-1.77c-2.95.64-3.58-1.42-3.58-1.42-.48-1.24-1.18-1.57-1.18-1.57-.96-.66.07-.65.07-.65 1.06.08 1.62 1.1 1.62 1.1.95 1.61 2.48 1.15 3.08.88.1-.68.37-1.15.67-1.41-2.35-.27-4.81-1.18-4.81-5.25 0-1.16.41-2.1 1.1-2.84-.11-.27-.48-1.36.1-2.83 0 0 .9-.29 2.95 1.08a10.1 10.1 0 0 1 5.37 0c2.04-1.37 2.94-1.08 2.94-1.08.58 1.47.22 2.56.11 2.83.68.74 1.09 1.68 1.09 2.84 0 4.08-2.47 4.98-4.83 5.24.38.33.72.97.72 1.96v2.9c0 .28.19.61.73.5A10.5 10.5 0 0 0 12 1.5Z" />
+              </svg>
             </a>
           </div>
 
@@ -230,8 +233,11 @@ export function Navigation() {
               href="https://github.com/garrettsiegel/react-lzy-img"
               target="_blank"
               rel="noopener noreferrer"
-              className="focus-ring block rounded-md border border-gray-300 px-4 py-3 text-center text-sm font-semibold text-gray-700 transition-colors hover:border-gray-400 hover:text-gray-900 dark:border-gray-700 dark:text-gray-300 dark:hover:border-gray-600 dark:hover:text-white"
+              className="focus-ring inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-md px-4 py-3 text-sm font-semibold text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white"
             >
+              <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4 fill-current">
+                <path d="M12 1.5a10.5 10.5 0 0 0-3.32 20.46c.53.1.72-.23.72-.5v-1.77c-2.95.64-3.58-1.42-3.58-1.42-.48-1.24-1.18-1.57-1.18-1.57-.96-.66.07-.65.07-.65 1.06.08 1.62 1.1 1.62 1.1.95 1.61 2.48 1.15 3.08.88.1-.68.37-1.15.67-1.41-2.35-.27-4.81-1.18-4.81-5.25 0-1.16.41-2.1 1.1-2.84-.11-.27-.48-1.36.1-2.83 0 0 .9-.29 2.95 1.08a10.1 10.1 0 0 1 5.37 0c2.04-1.37 2.94-1.08 2.94-1.08.58 1.47.22 2.56.11 2.83.68.74 1.09 1.68 1.09 2.84 0 4.08-2.47 4.98-4.83 5.24.38.33.72.97.72 1.96v2.9c0 .28.19.61.73.5A10.5 10.5 0 0 0 12 1.5Z" />
+              </svg>
               GitHub
             </a>
           </div>
