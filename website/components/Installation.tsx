@@ -14,25 +14,89 @@ async function copyToClipboard(content: string): Promise<boolean> {
   }
 }
 
+interface PropRow {
+  name: string;
+  type: string;
+  description: string;
+}
+
+const PROP_GROUPS: Array<{ title: string; rows: PropRow[] }> = [
+  {
+    title: 'Required',
+    rows: [
+      { name: 'src', type: 'string', description: 'Source URL for the image asset.' },
+      { name: 'alt', type: 'string', description: 'Alternative text used by assistive technologies.' },
+    ],
+  },
+  {
+    title: 'Placeholders',
+    rows: [
+      { name: 'placeholder', type: 'string', description: 'URL for a low-fidelity placeholder image.' },
+      { name: 'blurhash', type: 'string', description: 'Blurhash token rendered before the image loads.' },
+      { name: 'lqip', type: 'string', description: 'Low-quality image placeholder source.' },
+    ],
+  },
+  {
+    title: 'Layout & Loading',
+    rows: [
+      { name: 'aspectRatio', type: 'number', description: 'Reserve space and avoid layout shift while loading.' },
+      { name: 'srcSet', type: 'string', description: 'Responsive image sources for the picture/source pipeline.' },
+      { name: 'sizes', type: 'string', description: 'Viewport sizing hints used with srcSet.' },
+      { name: 'priority', type: 'boolean', description: 'Loads immediately for above-the-fold content.' },
+      { name: 'fetchPriority', type: "'high' | 'low' | 'auto'", description: 'Browser fetch priority hint.' },
+      { name: 'fadeIn', type: 'boolean', description: 'Enable or disable the default fade-in transition.' },
+    ],
+  },
+  {
+    title: 'Resilience & Accessibility',
+    rows: [
+      { name: 'fallback', type: 'ReactNode | string', description: 'UI rendered after final load failure.' },
+      { name: 'retryAttempts', type: 'number', description: 'How many retry attempts to perform after failure.' },
+      { name: 'retryDelay', type: 'number', description: 'Delay in milliseconds between retries.' },
+      { name: 'retryBackoff', type: 'boolean', description: 'Enable exponential backoff between retries.' },
+      { name: 'loadingLabel', type: 'string', description: 'Accessible loading announcement for screen readers.' },
+    ],
+  },
+];
+
+const QUICK_START_EXAMPLE = `import { LazyImage } from 'react-lzy-img';
+
+<LazyImage
+  src="/image.jpg"
+  alt="Description"
+  width={600}
+  height={400}
+/>`;
+
 export function Installation() {
+  // ============================================================
+  // STATE
+  // ============================================================
   const [copiedInstall, setCopiedInstall] = useState(false);
   const [copiedQuickStart, setCopiedQuickStart] = useState(false);
+
+  // ============================================================
+  // RENDER
+  // ============================================================
   return (
-    <div className="bg-white py-20 sm:py-32">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-20">
-          <h2 className="text-5xl sm:text-6xl font-black text-gray-900 mb-6 tracking-tight">Get Started in Seconds</h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto font-medium">
+    <div className="border-t border-gray-200 bg-white py-20 dark:border-gray-800 dark:bg-gray-950 sm:py-24">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mb-14 max-w-3xl">
+          <h2 className="text-4xl font-black tracking-tighter text-gray-900 dark:text-white sm:text-5xl">
+            Get Started in Seconds
+          </h2>
+          <p className="mt-4 text-lg text-gray-600 dark:text-gray-300">
             Install react-lzy-img and start optimizing your images immediately
           </p>
         </div>
 
-        <div className="max-w-4xl mx-auto space-y-8">
+        <div className="mx-auto max-w-5xl space-y-6">
           {/* Install */}
-          <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl p-8 shadow-2xl border-2 border-gray-700">
-            <div className="flex items-center justify-between mb-6">
-              <span className="text-gray-400 text-sm font-bold tracking-wider uppercase">Install</span>
+          <div className="overflow-hidden rounded-lg border border-gray-800 bg-gray-950">
+            <div className="flex items-center justify-between border-b border-gray-800 px-4 py-3">
+              <span className="text-xs font-semibold uppercase tracking-[0.12em] text-gray-400">Install</span>
               <button
+                type="button"
                 onClick={async () => {
                   const copied = await copyToClipboard('npm install react-lzy-img');
                   if (!copied) {
@@ -41,151 +105,88 @@ export function Installation() {
                   setCopiedInstall(true);
                   setTimeout(() => setCopiedInstall(false), 2000);
                 }}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold transition-all duration-200 focus-ring min-h-[44px]"
+                className="focus-ring inline-flex h-9 w-9 items-center justify-center rounded-md text-gray-300 transition-colors hover:bg-gray-800 hover:text-white"
                 aria-label="Copy install command"
               >
                 {copiedInstall ? (
-                  <>
-                    <CheckIcon className="w-4 h-4 text-green-400" />
-                    Copied!
-                  </>
+                  <CheckIcon className="h-4 w-4 text-emerald-400" />
                 ) : (
-                  <>
-                    <ClipboardDocumentIcon className="w-4 h-4" />
-                    Copy
-                  </>
+                  <ClipboardDocumentIcon className="h-4 w-4" />
                 )}
               </button>
             </div>
-            <pre className="text-lg text-green-400 font-semibold">
+
+            <pre className="px-4 py-4 text-sm font-semibold text-gray-100">
               <code>npm install react-lzy-img</code>
             </pre>
           </div>
 
           {/* Quick Start */}
-          <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl p-8 shadow-2xl border-2 border-gray-700">
-            <div className="flex items-center justify-between mb-6">
-              <span className="text-gray-400 text-sm font-bold tracking-wider uppercase">Quick Start</span>
+          <div className="overflow-hidden rounded-lg border border-gray-800 bg-gray-950">
+            <div className="flex items-center justify-between border-b border-gray-800 px-4 py-3">
+              <span className="text-xs font-semibold uppercase tracking-[0.12em] text-gray-400">Quick Start</span>
               <button
+                type="button"
                 onClick={async () => {
-                  const copied = await copyToClipboard(`import { LazyImage } from 'react-lzy-img';
-
-<LazyImage
-  src="/image.jpg"
-  alt="Description"
-  width={600}
-  height={400}
-/>`);
+                  const copied = await copyToClipboard(QUICK_START_EXAMPLE);
                   if (!copied) {
                     return;
                   }
                   setCopiedQuickStart(true);
                   setTimeout(() => setCopiedQuickStart(false), 2000);
                 }}
-                className="flex items-center gap-2 px-5 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold transition-all duration-200 focus-ring min-h-[44px]"
+                className="focus-ring inline-flex h-9 w-9 items-center justify-center rounded-md text-gray-300 transition-colors hover:bg-gray-800 hover:text-white"
                 aria-label="Copy quick start code"
               >
                 {copiedQuickStart ? (
-                  <>
-                    <CheckIcon className="w-4 h-4 text-green-400" />
-                    Copied!
-                  </>
+                  <CheckIcon className="h-4 w-4 text-emerald-400" />
                 ) : (
-                  <>
-                    <ClipboardDocumentIcon className="w-4 h-4" />
-                    Copy
-                  </>
+                  <ClipboardDocumentIcon className="h-4 w-4" />
                 )}
               </button>
             </div>
-            <pre className="text-sm text-gray-100 overflow-x-auto">
-              <code>{`import { LazyImage } from 'react-lzy-img';
 
-<LazyImage
-  src="/image.jpg"
-  alt="Description"
-  width={600}
-  height={400}
-/>`}</code>
+            <pre className="overflow-x-auto px-4 py-5 text-sm leading-relaxed text-gray-100">
+              <code>{QUICK_START_EXAMPLE}</code>
             </pre>
           </div>
 
           {/* API Props */}
-          <div className="bg-gradient-to-br from-white to-blue-50 rounded-3xl p-10 shadow-2xl border-2 border-blue-200 noise-texture">
-            <h3 className="text-3xl font-black text-gray-900 mb-8">Essential Props</h3>
-            <div className="space-y-6">
-              <div className="border-l-4 border-blue-500 pl-4 py-2">
-                <code className="text-blue-600 font-bold text-lg">src</code>
-                <span className="text-gray-500 ml-2 font-medium">string (required)</span>
-                <p className="text-gray-600 mt-1.5">The source URL of the image</p>
-              </div>
-              <div className="border-l-4 border-blue-500 pl-4 py-2">
-                <code className="text-blue-600 font-bold text-lg">alt</code>
-                <span className="text-gray-500 ml-2 font-medium">string (required)</span>
-                <p className="text-gray-600 mt-1.5">Alternative text for accessibility</p>
-              </div>
-              <div className="border-l-4 border-cyan-500 pl-4 py-2">
-                <code className="text-cyan-600 font-bold text-lg">placeholder</code>
-                <span className="text-gray-500 ml-2 font-medium">string</span>
-                <p className="text-gray-600 mt-1.5">URL for placeholder image</p>
-              </div>
-              <div className="border-l-4 border-cyan-500 pl-4 py-2">
-                <code className="text-cyan-600 font-bold text-lg">blurhash</code>
-                <span className="text-gray-500 ml-2 font-medium">string</span>
-                <p className="text-gray-600 mt-1.5">Blurhash string for placeholder</p>
-              </div>
-              <div className="border-l-4 border-cyan-500 pl-4 py-2">
-                <code className="text-cyan-600 font-bold text-lg">priority</code>
-                <span className="text-gray-500 ml-2 font-medium">boolean</span>
-                <p className="text-gray-600 mt-1.5">Load image immediately (above-the-fold)</p>
-              </div>
-              <div className="border-l-4 border-cyan-500 pl-4 py-2">
-                <code className="text-cyan-600 font-bold text-lg">srcSet</code>
-                <span className="text-gray-500 ml-2 font-medium">string</span>
-                <p className="text-gray-600 mt-1.5">Responsive image sources</p>
-              </div>
-              <div className="border-l-4 border-cyan-500 pl-4 py-2">
-                <code className="text-cyan-600 font-bold text-lg">aspectRatio</code>
-                <span className="text-gray-500 ml-2 font-medium">number</span>
-                <p className="text-gray-600 mt-1.5">Aspect ratio for layout (e.g., 16/9)</p>
-              </div>
-              <div className="border-l-4 border-cyan-500 pl-4 py-2">
-                <code className="text-cyan-600 font-bold text-lg">fadeIn</code>
-                <span className="text-gray-500 ml-2 font-medium">boolean (default: true)</span>
-                <p className="text-gray-600 mt-1.5">Enable fade-in animation on load</p>
-              </div>
-              <div className="border-l-4 border-cyan-500 pl-4 py-2">
-                <code className="text-cyan-600 font-bold text-lg">fallback</code>
-                <span className="text-gray-500 ml-2 font-medium">ReactNode | string</span>
-                <p className="text-gray-600 mt-1.5">Error-state UI when image loading fails</p>
-              </div>
-              <div className="border-l-4 border-cyan-500 pl-4 py-2">
-                <code className="text-cyan-600 font-bold text-lg">retryAttempts</code>
-                <span className="text-gray-500 ml-2 font-medium">number</span>
-                <p className="text-gray-600 mt-1.5">How many times to retry failed image requests</p>
-              </div>
-              <div className="border-l-4 border-cyan-500 pl-4 py-2">
-                <code className="text-cyan-600 font-bold text-lg">loadingLabel</code>
-                <span className="text-gray-500 ml-2 font-medium">string</span>
-                <p className="text-gray-600 mt-1.5">Optional screen reader announcement while loading</p>
-              </div>
-              <div className="border-l-4 border-cyan-500 pl-4 py-2">
-                <code className="text-cyan-600 font-bold text-lg">fetchPriority</code>
-                <span className="text-gray-500 ml-2 font-medium">'high' | 'low' | 'auto'</span>
-                <p className="text-gray-600 mt-1.5">Browser fetch priority hint for image loading order</p>
-              </div>
+          <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900 sm:p-8">
+            <h3 className="text-2xl font-black tracking-tighter text-gray-900 dark:text-white">Essential Props</h3>
+            <div className="mt-6 space-y-8">
+              {PROP_GROUPS.map((group) => (
+                <div key={group.title}>
+                  <h4 className="text-xs font-semibold uppercase tracking-[0.12em] text-gray-500 dark:text-gray-400">
+                    {group.title}
+                  </h4>
+
+                  <div className="mt-3 overflow-hidden rounded-md border border-gray-200 dark:border-gray-800">
+                    {group.rows.map((row) => (
+                      <div
+                        key={row.name}
+                        className="grid grid-cols-1 gap-2 border-t border-gray-200 px-4 py-3 first:border-t-0 sm:grid-cols-[180px_190px_1fr] dark:border-gray-800"
+                      >
+                        <code className="text-sm font-semibold text-indigo-600 dark:text-indigo-400">{row.name}</code>
+                        <span className="text-xs font-medium text-gray-500 dark:text-gray-400">{row.type}</span>
+                        <p className="text-sm text-gray-600 dark:text-gray-300">{row.description}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
           {/* Documentation Link */}
-          <div className="text-center pt-8">
+          <div className="pt-2 text-left">
             <a
               href="https://github.com/garrettsiegel/react-lzy-img#readme"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-10 py-5 rounded-2xl font-bold text-lg hover:shadow-2xl hover:shadow-blue-500/50 hover:scale-[1.02] transition-all duration-200 focus-ring"
+              className="focus-ring inline-flex items-center gap-2 rounded-md border border-gray-300 px-4 py-3 text-sm font-semibold text-gray-700 transition-colors hover:border-gray-400 hover:text-gray-900 dark:border-gray-700 dark:text-gray-300 dark:hover:border-gray-600 dark:hover:text-white"
             >
-              <BookOpenIcon className="w-6 h-6" />
+              <BookOpenIcon className="h-5 w-5" />
               View Full Documentation
             </a>
           </div>

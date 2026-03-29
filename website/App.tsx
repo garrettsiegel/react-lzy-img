@@ -7,21 +7,21 @@ import { Footer } from './components/Footer';
 
 export function App() {
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white text-gray-900 transition-colors duration-200 dark:bg-gray-950 dark:text-gray-100">
       <Navigation />
-      <main>
-        <div id="hero">
+      <main id="main-content" className="pt-16">
+        <section id="hero">
           <Hero />
-        </div>
-        <div id="features">
+        </section>
+        <section id="features">
           <Features />
-        </div>
-        <div id="examples">
+        </section>
+        <section id="examples">
           <Examples />
-        </div>
-        <div id="installation">
+        </section>
+        <section id="installation">
           <Installation />
-        </div>
+        </section>
       </main>
       <Footer />
     </div>

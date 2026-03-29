@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { type KeyboardEvent, useRef, useState } from 'react';
 import { ClipboardDocumentIcon, CheckIcon } from '@heroicons/react/24/solid';
 import { LazyImage } from 'react-lzy-img';
 
@@ -172,6 +172,7 @@ export function Examples() {
   const [activeTab, setActiveTab] = useState<ExampleKey>('basic');
   const [copied, setCopied] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
 
   // ============================================================
   // HANDLERS
@@ -194,39 +195,85 @@ export function Examples() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const focusTab = (index: number) => {
+    const tabElement = tabRefs.current[index];
+    if (tabElement) {
+      tabElement.focus();
+    }
+  };
+
+  const handleTabKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
+    const lastIndex = EXAMPLE_KEYS.length - 1;
+
+    if (event.key === 'ArrowRight') {
+      event.preventDefault();
+      const nextIndex = index === lastIndex ? 0 : index + 1;
+      handleTabChange(EXAMPLE_KEYS[nextIndex]);
+      focusTab(nextIndex);
+      return;
+    }
+
+    if (event.key === 'ArrowLeft') {
+      event.preventDefault();
+      const nextIndex = index === 0 ? lastIndex : index - 1;
+      handleTabChange(EXAMPLE_KEYS[nextIndex]);
+      focusTab(nextIndex);
+      return;
+    }
+
+    if (event.key === 'Home') {
+      event.preventDefault();
+      handleTabChange(EXAMPLE_KEYS[0]);
+      focusTab(0);
+      return;
+    }
+
+    if (event.key === 'End') {
+      event.preventDefault();
+      handleTabChange(EXAMPLE_KEYS[lastIndex]);
+      focusTab(lastIndex);
+    }
+  };
+
   // ============================================================
   // RENDER
   // ============================================================
   const activeExample = EXAMPLES[activeTab];
 
   return (
-    <div className="bg-gradient-to-b from-slate-50 to-white py-24 sm:py-32">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="bg-white py-20 dark:bg-gray-950 sm:py-24">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* HEADER */}
-        <div className="text-center mb-16">
-          <h2 className="text-4xl sm:text-5xl font-black text-gray-900 mb-4 tracking-tight">
+        <div className="mb-12">
+          <h2 className="text-4xl font-black tracking-tighter text-gray-900 dark:text-white sm:text-5xl">
             See It In Action
           </h2>
-          <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto font-medium">
+          <p className="mt-4 max-w-2xl text-lg text-gray-600 dark:text-gray-300">
             Interactive examples showing real-world use cases
           </p>
         </div>
 
         {/* TABS */}
-        <div className="flex flex-wrap gap-3 mb-12 justify-center">
+        <div role="tablist" aria-label="Example tabs" className="mb-10 flex flex-wrap items-end gap-6 border-b border-gray-200 dark:border-gray-800">
           {EXAMPLE_KEYS.map((key, index) => (
             <button
               key={key}
+              id={`tab-${key}`}
+              ref={(element) => {
+                tabRefs.current[index] = element;
+              }}
+              type="button"
+              role="tab"
+              aria-controls={`panel-${key}`}
+              aria-selected={activeTab === key}
+              tabIndex={activeTab === key ? 0 : -1}
               onClick={() => handleTabChange(key)}
-              className={`
-                px-6 py-3 rounded-xl font-bold text-base transition-all duration-200
-                focus-ring
-                ${activeTab === key
-                  ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg shadow-blue-500/30 scale-105'
-                  : 'bg-white text-gray-700 hover:bg-gray-50 shadow-md hover:shadow-lg border-2 border-gray-200 hover:border-blue-300'
-                }
-              `}
-              style={activeTab === key ? {} : { animationDelay: `${index * 0.05}s` }}
+              onKeyDown={(event) => handleTabKeyDown(event, index)}
+              className={`focus-ring -mb-px border-b-2 px-1 pb-3 text-sm font-semibold transition-colors sm:text-base ${
+                activeTab === key
+                  ? 'border-indigo-500 text-gray-900 dark:text-white'
+                  : 'border-transparent text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'
+              }`}
             >
               {EXAMPLES[key].title}
             </button>
@@ -234,43 +281,41 @@ export function Examples() {
         </div>
 
         {/* CONTENT */}
-        <div className={`
-          grid grid-cols-1 lg:grid-cols-2 gap-8 transition-opacity duration-150
-          ${isTransitioning ? 'opacity-0' : 'opacity-100'}
-        `}>
+        <div className={`grid grid-cols-1 gap-6 transition-opacity duration-150 lg:grid-cols-2 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
           {/* CODE BLOCK */}
-          <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl p-8 overflow-hidden shadow-2xl border-2 border-gray-700 noise-texture">
-            <div className="flex items-center justify-between mb-6">
-              <span className="text-gray-400 text-sm font-bold tracking-wider uppercase">Code</span>
+          <div
+            id={`panel-${activeTab}`}
+            role="tabpanel"
+            aria-labelledby={`tab-${activeTab}`}
+            className="overflow-hidden rounded-xl border border-gray-800 bg-gray-950"
+          >
+            <div className="flex items-center justify-between border-b border-gray-800 px-4 py-3">
+              <span className="text-xs font-semibold uppercase tracking-[0.12em] text-gray-400">Code</span>
               <button
+                type="button"
                 onClick={async () => handleCopy(activeExample.code)}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold transition-all duration-200 focus-ring"
+                className="focus-ring inline-flex h-9 w-9 items-center justify-center rounded-md text-gray-300 transition-colors hover:bg-gray-800 hover:text-white"
                 aria-label="Copy code to clipboard"
               >
                 {copied ? (
-                  <>
-                    <CheckIcon className="w-4 h-4 text-green-400" />
-                    Copied!
-                  </>
+                  <CheckIcon className="h-4 w-4 text-emerald-400" />
                 ) : (
-                  <>
-                    <ClipboardDocumentIcon className="w-4 h-4" />
-                    Copy
-                  </>
+                  <ClipboardDocumentIcon className="h-4 w-4" />
                 )}
               </button>
             </div>
-            <pre className="text-sm text-gray-100 overflow-x-auto">
+
+            <pre className="overflow-x-auto px-4 py-5 text-sm leading-relaxed text-gray-100" aria-label="Code example">
               <code>{activeExample.code}</code>
             </pre>
           </div>
 
           {/* DEMO PREVIEW */}
-          <div className="bg-white rounded-3xl p-8 shadow-2xl border-2 border-gray-200">
-            <div className="mb-6">
-              <span className="text-gray-600 text-sm font-bold tracking-wider uppercase">Live Demo</span>
+          <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-900">
+            <div className="mb-4">
+              <span className="text-xs font-semibold uppercase tracking-[0.12em] text-gray-500 dark:text-gray-400">Live Demo</span>
             </div>
-            <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-6 border-2 border-gray-200 min-h-[300px]">
+            <div className="min-h-[300px] rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
               {activeExample.demo}
             </div>
           </div>

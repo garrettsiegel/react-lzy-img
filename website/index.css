@@ -3,8 +3,17 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  .dark {
+    color-scheme: dark;
+  }
+
   html {
     scroll-behavior: smooth;
+    background-color: #ffffff;
   }
 
   body {
@@ -14,6 +23,14 @@
       sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    background-color: #ffffff;
+    color: #111827;
+    transition: background-color 200ms ease, color 200ms ease;
+  }
+
+  .dark body {
+    background-color: #030712;
+    color: #f3f4f6;
   }
 
   code {
@@ -24,7 +41,7 @@
   h1, h2, h3, h4, h5, h6 {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-weight: 900;
-    letter-spacing: -0.03em;
+    letter-spacing: -0.04em;
   }
 
   /* PREFERS REDUCED MOTION */
@@ -45,7 +62,7 @@
   @keyframes fade-in-up {
     0% {
       opacity: 0;
-      transform: translateY(20px);
+      transform: translateY(10px);
     }
     100% {
       opacity: 1;
@@ -55,44 +72,35 @@
 
   .animate-fade-in-up {
     opacity: 0;
-    animation: fade-in-up 0.4s ease-out forwards;
+    animation: fade-in-up 0.3s ease-out forwards;
     animation-fill-mode: both;
   }
 
   .animate-stagger {
     opacity: 0;
-    animation: fade-in-up 0.5s ease-out forwards;
+    animation: fade-in-up 0.3s ease-out forwards;
   }
 
-  /* NOISE TEXTURE UTILITY */
-  .noise-texture {
-    position: relative;
-  }
-
-  .noise-texture::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 1;
-  }
-
-  .noise-texture > * {
-    position: relative;
-    z-index: 2;
-  }
-
-  /* GLASSMORPHISM */
+  /* GLASS SURFACE */
   .glass {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    @apply bg-white/80 border border-gray-200/80 backdrop-blur-xl;
+  }
+
+  .dark .glass {
+    @apply bg-gray-950/80 border-gray-800/80;
+  }
+
+  /* SKIP LINK */
+  .skip-link {
+    @apply sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[60] focus:rounded-md focus:bg-white focus:px-4 focus:py-2 focus:font-semibold focus:text-gray-900 focus:shadow-md;
+  }
+
+  .dark .skip-link {
+    @apply focus:bg-gray-900 focus:text-gray-100;
   }
 
   /* FOCUS VISIBLE UTILITIES */
   .focus-ring {
-    @apply focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:outline-none;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-gray-950;
   }
 }

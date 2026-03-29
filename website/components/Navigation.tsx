@@ -1,11 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/solid';
+import { ThemeToggle } from './ThemeToggle';
 
 const NAV_ITEMS = [
   { id: 'features', label: 'Features' },
   { id: 'examples', label: 'Examples' },
   { id: 'installation', label: 'Install' },
-];
+] as const;
+
+type SectionId = 'hero' | 'features' | 'examples' | 'installation';
+const OBSERVED_SECTIONS: SectionId[] = ['hero', 'features', 'examples', 'installation'];
 
 export function Navigation() {
   // ============================================================
@@ -13,6 +17,8 @@ export function Navigation() {
   // ============================================================
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState<SectionId>('hero');
+  const mobileMenuRef = useRef<HTMLDivElement | null>(null);
 
   // ============================================================
   // EFFECTS
@@ -26,13 +32,92 @@ export function Navigation() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id as SectionId);
+          }
+        });
+      },
+      {
+        threshold: 0,
+        rootMargin: '-45% 0px -45% 0px',
+      }
+    );
+
+    OBSERVED_SECTIONS.forEach((sectionId) => {
+      const section = document.getElementById(sectionId);
+      if (section) {
+        observer.observe(section);
+      }
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!isMobileMenuOpen) {
+      return;
+    }
+
+    const menuElement = mobileMenuRef.current;
+    if (!menuElement) {
+      return;
+    }
+
+    const focusableElements = Array.from(
+      menuElement.querySelectorAll<HTMLElement>('a[href], button:not([disabled])')
+    );
+
+    if (focusableElements.length === 0) {
+      return;
+    }
+
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+    const previousOverflow = document.body.style.overflow;
+
+    firstElement.focus();
+    document.body.style.overflow = 'hidden';
+
+    const handleKeydown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsMobileMenuOpen(false);
+        return;
+      }
+
+      if (event.key !== 'Tab') {
+        return;
+      }
+
+      if (event.shiftKey && document.activeElement === firstElement) {
+        event.preventDefault();
+        lastElement.focus();
+      }
+
+      if (!event.shiftKey && document.activeElement === lastElement) {
+        event.preventDefault();
+        firstElement.focus();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeydown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener('keydown', handleKeydown);
+    };
+  }, [isMobileMenuOpen]);
+
   // ============================================================
   // HANDLERS
   // ============================================================
-  const scrollToSection = (id: string) => {
+  const scrollToSection = (id: SectionId) => {
     const element = document.getElementById(id);
     if (element) {
-      const offset = 80;
+      const offset = 72;
       const elementPosition = element.getBoundingClientRect().top;
       const offsetPosition = elementPosition + window.scrollY - offset;
 
@@ -41,6 +126,7 @@ export function Navigation() {
         behavior: 'smooth'
       });
     }
+    setActiveSection(id);
     setIsMobileMenuOpen(false);
   };
 
@@ -48,21 +134,23 @@ export function Navigation() {
   // RENDER
   // ============================================================
   return (
-    <nav
-      className={`
-        fixed top-0 left-0 right-0 z-50 transition-all duration-300
-        ${isScrolled 
-          ? 'bg-white/80 backdrop-blur-xl shadow-lg' 
-          : 'bg-transparent'
-        }
-      `}
-    >
+    <>
+      <a href="#main-content" className="skip-link">
+        Skip to content
+      </a>
+      <nav
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-200 ${
+          isScrolled
+            ? 'glass border-b border-gray-200/80 dark:border-gray-800/80'
+            : 'bg-transparent'
+        }`}
+      >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* LOGO */}
           <button
             onClick={() => scrollToSection('hero')}
-            className="text-xl font-black tracking-tight text-gray-900 hover:text-blue-600 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-lg px-2 py-1"
+            className="focus-ring rounded-md px-2 py-1 text-lg font-black tracking-tighter text-gray-900 transition-colors hover:text-indigo-600 dark:text-gray-100 dark:hover:text-indigo-400"
           >
             react-lzy-img
           </button>
@@ -73,16 +161,24 @@ export function Navigation() {
               <button
                 key={item.id}
                 onClick={() => scrollToSection(item.id)}
-                className="px-4 py-2 text-sm font-semibold text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                aria-current={activeSection === item.id ? 'page' : undefined}
+                className={`focus-ring rounded-md px-4 py-2 text-sm font-semibold transition-colors ${
+                  activeSection === item.id
+                    ? 'text-gray-900 dark:text-white'
+                    : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white'
+                }`}
               >
                 {item.label}
               </button>
             ))}
+
+            <ThemeToggle />
+
             <a
               href="https://github.com/garrettsiegel/react-lzy-img"
               target="_blank"
               rel="noopener noreferrer"
-              className="ml-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-cyan-600 text-white text-sm font-bold rounded-xl hover:shadow-lg hover:shadow-blue-500/30 transition-all duration-200 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+              className="focus-ring ml-2 rounded-md border border-gray-300 px-3 py-2 text-sm font-semibold text-gray-700 transition-colors hover:border-gray-400 hover:text-gray-900 dark:border-gray-700 dark:text-gray-300 dark:hover:border-gray-600 dark:hover:text-white"
             >
               GitHub
             </a>
@@ -91,8 +187,9 @@ export function Navigation() {
           {/* MOBILE MENU BUTTON */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2.5 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-blue-500"
+            className="focus-ring rounded-md p-2 text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white md:hidden"
             aria-label="Toggle menu"
+            aria-expanded={isMobileMenuOpen}
           >
             {isMobileMenuOpen ? (
               <XMarkIcon className="w-6 h-6" />
@@ -105,13 +202,26 @@ export function Navigation() {
 
       {/* MOBILE MENU */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-white border-t border-gray-200 shadow-xl">
-          <div className="px-4 py-6 space-y-2">
+        <div
+          ref={mobileMenuRef}
+          role="dialog"
+          aria-label="Mobile navigation"
+          className="border-t border-gray-200 bg-white py-4 dark:border-gray-800 dark:bg-gray-950 md:hidden"
+        >
+          <div className="space-y-2 px-4">
+            <div className="pb-2">
+              <ThemeToggle />
+            </div>
             {NAV_ITEMS.map((item) => (
               <button
                 key={item.id}
                 onClick={() => scrollToSection(item.id)}
-                className="block w-full text-left px-4 py-3 text-base font-semibold text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                aria-current={activeSection === item.id ? 'page' : undefined}
+                className={`focus-ring block w-full rounded-md px-4 py-3 text-left text-base font-semibold transition-colors ${
+                  activeSection === item.id
+                    ? 'text-gray-900 dark:text-white'
+                    : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white'
+                }`}
               >
                 {item.label}
               </button>
@@ -120,13 +230,14 @@ export function Navigation() {
               href="https://github.com/garrettsiegel/react-lzy-img"
               target="_blank"
               rel="noopener noreferrer"
-              className="block w-full text-center px-4 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold rounded-xl hover:shadow-lg transition-all duration-200"
+              className="focus-ring block rounded-md border border-gray-300 px-4 py-3 text-center text-sm font-semibold text-gray-700 transition-colors hover:border-gray-400 hover:text-gray-900 dark:border-gray-700 dark:text-gray-300 dark:hover:border-gray-600 dark:hover:text-white"
             >
               GitHub
             </a>
           </div>
         </div>
       )}
-    </nav>
+      </nav>
+    </>
   );
 }

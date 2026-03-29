@@ -5,63 +5,42 @@ import {
   DevicePhoneMobileIcon,
   CubeIcon,
   UserGroupIcon,
-  ArrowPathIcon,
-  WrenchScrewdriverIcon,
-  SignalIcon,
 } from '@heroicons/react/24/solid';
 
 export function Features() {
   // ============================================================
   // DATA
   // ============================================================
-  const primaryFeatures = [
+  const features = [
     {
       icon: BoltIcon,
       title: 'Lazy Loading',
-      description: 'Load images only when users scroll to them. Saves bandwidth and speeds up your site dramatically.',
+      description: 'Loads images only when needed, reducing initial payload and improving real page speed.',
     },
     {
       icon: PhotoIcon,
       title: 'Smart Placeholders',
-      description: 'Beautiful blur effects with blurhash, LQIP, or standard placeholders. No blank spaces while loading.',
+      description: 'Supports blurhash, LQIP, and standard placeholders so loading states look intentional.',
     },
     {
       icon: CodeBracketIcon,
       title: 'TypeScript First',
-      description: 'Complete type definitions, IntelliSense support, and strict type safety out of the box.',
+      description: 'Strict typings and polished IntelliSense without extra setup.',
     },
-  ];
-
-  const secondaryFeatures = [
     {
       icon: DevicePhoneMobileIcon,
       title: 'Responsive Images',
-      description: 'Automatic <picture> element with srcSet/sizes support',
+      description: 'Works with srcSet and sizes for the right image at the right viewport.',
     },
     {
       icon: CubeIcon,
       title: 'Lightweight',
-      description: '~1.4KB gzipped with tree-shaking support',
+      description: 'Small bundle footprint with tree-shakable exports.',
     },
     {
       icon: UserGroupIcon,
       title: 'Accessible',
-      description: 'Built-in ARIA support and screen reader friendly',
-    },
-    {
-      icon: ArrowPathIcon,
-      title: 'Observer Pooling',
-      description: 'Shared IntersectionObserver instances by margin for efficient gallery rendering',
-    },
-    {
-      icon: SignalIcon,
-      title: 'Retry + Backoff',
-      description: 'Recover from transient failures with configurable retries and exponential delay',
-    },
-    {
-      icon: WrenchScrewdriverIcon,
-      title: 'useLazyLoad Hook',
-      description: 'Build custom lazy-loading UIs with a typed standalone hook export',
+      description: 'Includes semantic loading states and screen-reader friendly behavior.',
     },
   ];
 
@@ -69,65 +48,38 @@ export function Features() {
   // RENDER
   // ============================================================
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32">
-      {/* HEADER */}
-      <div className="text-center mb-16">
-        <h2 className="text-4xl sm:text-5xl font-black text-gray-900 mb-4 tracking-tight">
-          Everything you need
-        </h2>
-        <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto font-medium">
-          Production-ready lazy loading for modern React applications
-        </p>
-      </div>
+    <div className="border-y border-gray-200 bg-gray-50 py-20 dark:border-gray-800 dark:bg-gray-900 sm:py-24">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* HEADER */}
+        <div className="mb-14 max-w-3xl">
+          <h2 className="text-4xl font-black tracking-tighter text-gray-900 dark:text-white sm:text-5xl">
+            Built for modern React image performance
+          </h2>
+          <p className="mt-4 text-lg text-gray-600 dark:text-gray-300">
+            Focused primitives, strong defaults, and a minimal API that ships cleanly in production.
+          </p>
+        </div>
 
-      {/* PRIMARY FEATURES */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-        {primaryFeatures.map((feature, index) => {
-          const IconComponent = feature.icon;
-          return (
-            <div
-              key={feature.title}
-              className="group relative bg-white p-8 rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-gray-100 hover:border-blue-200 hover:-translate-y-1 cursor-pointer overflow-hidden noise-texture animate-stagger"
-              style={{ animationDelay: `${index * 0.1}s` }}
-            >
-              {/* GRADIENT ACCENT */}
-              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-full -mr-16 -mt-16 opacity-50 group-hover:opacity-100 transition-opacity" />
-              
-              {/* CONTENT */}
-              <div className="relative">
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                  <IconComponent className="w-8 h-8 text-white" />
+        {/* FEATURE GRID */}
+        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3">
+          {features.map((feature) => {
+            const IconComponent = feature.icon;
+
+            return (
+              <div key={feature.title} className="group animate-stagger">
+                <div className="flex items-center gap-3">
+                  <IconComponent className="h-5 w-5 text-indigo-500 dark:text-indigo-400" />
+                  <h3 className="text-base font-semibold text-gray-900 transition-colors group-hover:text-indigo-600 dark:text-white dark:group-hover:text-indigo-400">
+                    {feature.title}
+                  </h3>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors">
-                  {feature.title}
-                </h3>
-                <p className="text-gray-600 leading-relaxed">{feature.description}</p>
+                <p className="mt-3 max-w-sm text-sm leading-relaxed text-gray-600 dark:text-gray-300">
+                  {feature.description}
+                </p>
               </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* SECONDARY FEATURES */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {secondaryFeatures.map((feature, index) => {
-          const IconComponent = feature.icon;
-          return (
-            <div
-              key={feature.title}
-              className="group flex items-start gap-4 p-6 bg-gray-50 rounded-2xl hover:bg-white hover:shadow-md transition-all duration-200 animate-stagger"
-              style={{ animationDelay: `${(index + 3) * 0.1}s` }}
-            >
-              <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
-                <IconComponent className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h4 className="font-bold text-gray-900 mb-1">{feature.title}</h4>
-                <p className="text-sm text-gray-600">{feature.description}</p>
-              </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
     </div>
   );

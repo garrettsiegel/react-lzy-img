@@ -1,13 +1,17 @@
-import { ArrowRightIcon, StarIcon, BoltIcon, CheckCircleIcon, CodeBracketIcon } from '@heroicons/react/24/solid';
+import { ArrowRightIcon, CodeBracketIcon } from '@heroicons/react/24/solid';
+
+const HERO_SNIPPET = `import { LazyImage } from 'react-lzy-img';
+
+<LazyImage src="/hero.jpg" alt="Hero image" width={1200} height={800} />`;
 
 export function Hero() {
   // ============================================================
   // HANDLERS
   // ============================================================
-  const scrollToExamples = () => {
-    const element = document.getElementById('examples');
+  const scrollToInstall = () => {
+    const element = document.getElementById('installation');
     if (element) {
-      const offset = 80;
+      const offset = 72;
       const elementPosition = element.getBoundingClientRect().top;
       const offsetPosition = elementPosition + window.scrollY - offset;
       window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
@@ -18,118 +22,51 @@ export function Hero() {
   // RENDER
   // ============================================================
   return (
-    <div className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-700 to-cyan-700 noise-texture pt-16">
-      {/* ANIMATED BACKGROUND ELEMENTS */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div 
-          className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-to-br from-blue-400/20 to-transparent rounded-full blur-3xl" 
-          style={{
-            animation: 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-          }}
-        ></div>
-        <div 
-          className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-gradient-to-tl from-cyan-400/20 to-transparent rounded-full blur-3xl" 
-          style={{
-            animation: 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-            animationDelay: '2s',
-          }}
-        ></div>
-      </div>
-      
-      {/* CONTENT */}
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32">
-        <div className="text-center">
-          {/* BADGE */}
-          <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 mb-8 animate-fade-in-up">
-            <BoltIcon className="w-4 h-4 text-yellow-300" />
-            <span className="text-sm font-semibold text-white">Lightning Fast Image Loading</span>
-          </div>
-          
-          {/* HEADLINE */}
-          <div className="animate-fade-in-up" style={{animationDelay: '0.1s'}}>
-            <h1 className="text-5xl sm:text-7xl lg:text-8xl font-black text-white mb-6 tracking-tight leading-none">
-              react-lzy-img
-            </h1>
-          </div>
-          
-          {/* VALUE PROPOSITION */}
-          <p className="text-xl sm:text-2xl text-blue-50 mb-4 max-w-3xl mx-auto font-medium leading-relaxed animate-fade-in-up" style={{animationDelay: '0.2s'}}>
-            Stop losing users to slow-loading images.
-          </p>
-          <p className="text-lg sm:text-xl text-blue-100 mb-12 max-w-2xl mx-auto font-normal leading-relaxed animate-fade-in-up" style={{animationDelay: '0.25s'}}>
-            Ship faster pages with lazy loading, responsive images, and smart placeholders — all in <span className="font-black text-white">1.4KB</span>.
-          </p>
-          
-          {/* CTA BUTTONS WITH FLOATING BADGES */}
-          <div className="relative flex flex-col sm:flex-row gap-4 justify-center items-center mb-16 animate-fade-in-up max-w-5xl mx-auto px-4" style={{animationDelay: '0.3s'}}>
-            {/* FLOATING BADGE - TEST COVERAGE */}
-            <div 
-              className="hidden 2xl:block absolute left-0 top-1/2 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl px-4 py-3 shadow-xl animate-fade-in-up noise-texture"
-              style={{
-                animationDelay: '0.5s',
-                transform: 'translateY(-50%) rotate(-3deg)',
-              }}
-            >
-              <div className="flex items-center gap-2">
-                <CheckCircleIcon className="w-5 h-5 text-green-400" />
-                <div className="text-left">
-                  <div className="text-xl font-black text-white leading-none">97%</div>
-                  <div className="text-xs text-white/60 uppercase tracking-wide">Tested</div>
-                </div>
-              </div>
-            </div>
+    <div className="border-b border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-950">
+      <div className="mx-auto max-w-5xl px-4 py-20 sm:px-6 sm:py-28 lg:px-8">
+        <p className="animate-fade-in-up text-sm font-semibold uppercase tracking-[0.16em] text-gray-500 dark:text-gray-400">
+          React Image Loading Library
+        </p>
 
-            {/* FLOATING BADGE - TYPESCRIPT */}
-            <div 
-              className="hidden 2xl:block absolute right-0 top-1/2 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl px-4 py-3 shadow-xl animate-fade-in-up noise-texture"
-              style={{
-                animationDelay: '0.6s',
-                transform: 'translateY(-50%) rotate(2deg)',
-              }}
-            >
-              <div className="flex items-center gap-2">
-                <CodeBracketIcon className="w-5 h-5 text-blue-400" />
-                <div className="text-left">
-                  <div className="text-xl font-black text-white leading-none">100%</div>
-                  <div className="text-xs text-white/60 uppercase tracking-wide">TypeScript</div>
-                </div>
-              </div>
-            </div>
+        <h1 className="animate-fade-in-up mt-4 text-5xl font-black tracking-tighter text-gray-900 dark:text-white sm:text-6xl lg:text-7xl">
+          react-lzy-img
+        </h1>
 
-            <button
-              onClick={scrollToExamples}
-              className="group inline-flex items-center gap-3 bg-white text-blue-600 px-8 py-4 rounded-2xl font-bold text-lg hover:bg-blue-50 hover:scale-[1.02] shadow-2xl hover:shadow-blue-500/50 transition-all duration-200 focus-ring"
-            >
-              Try Interactive Demo
-              <ArrowRightIcon className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </button>
-            <a
-              href="https://www.npmjs.com/package/react-lzy-img"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group inline-flex items-center gap-3 bg-white/10 backdrop-blur-md border-2 border-white/30 text-white px-8 py-4 rounded-2xl font-bold text-lg hover:bg-white/20 hover:scale-[1.02] transition-all duration-200 focus-ring"
-            >
-              Read Docs
-              <ArrowRightIcon className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </a>
-            <a
-              href="https://github.com/garrettsiegel/react-lzy-img"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-white hover:text-blue-100 px-4 py-4 rounded-xl font-semibold transition-colors focus-ring"
-            >
-              <StarIcon className="w-5 h-5 text-yellow-300" />
-              Star on GitHub
-            </a>
-          </div>
+        <p className="animate-fade-in-up mt-6 max-w-3xl text-lg leading-relaxed text-gray-600 dark:text-gray-300 sm:text-xl">
+          Lazy loading, responsive sources, and resilient placeholders in one lightweight package. Production-ready in
+          {' '}
+          <span className="font-black text-gray-900 dark:text-white">~1.4KB gzipped</span>.
+        </p>
+
+        <div className="animate-fade-in-up mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
+          <button
+            onClick={scrollToInstall}
+            className="focus-ring inline-flex items-center justify-center gap-2 rounded-md border border-indigo-500 bg-indigo-500 px-5 py-3 text-sm font-semibold text-white transition-colors hover:border-indigo-600 hover:bg-indigo-600"
+          >
+            Get Started
+            <ArrowRightIcon className="h-4 w-4" />
+          </button>
+
+          <a
+            href="https://github.com/garrettsiegel/react-lzy-img"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="focus-ring inline-flex items-center justify-center rounded-md border border-gray-300 px-5 py-3 text-sm font-semibold text-gray-700 transition-colors hover:border-gray-400 hover:text-gray-900 dark:border-gray-700 dark:text-gray-300 dark:hover:border-gray-600 dark:hover:text-white"
+          >
+            View on GitHub
+          </a>
         </div>
-      </div>
-      
-      {/* WAVE DIVIDER */}
-      <div className="absolute bottom-0 left-0 right-0 -mb-px">
-        <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="block w-full">
-          <path d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" fill="rgb(248 250 252)"/>
-        </svg>
+
+        <div className="animate-fade-in-up mt-12 overflow-hidden rounded-xl border border-gray-800 bg-gray-950">
+          <div className="flex items-center gap-2 border-b border-gray-800 px-4 py-3">
+            <CodeBracketIcon className="h-4 w-4 text-indigo-400" />
+            <span className="text-xs font-semibold uppercase tracking-[0.12em] text-gray-400">Quick Start</span>
+          </div>
+
+          <pre className="overflow-x-auto px-4 py-5 text-sm leading-relaxed text-gray-100">
+            <code>{HERO_SNIPPET}</code>
+          </pre>
+        </div>
       </div>
     </div>
   );
